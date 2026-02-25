@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuyumcu Ekranı</title>
+    <style>
+        :root {
+            --bg-body: #121212;
+            --bg-kutu: #1e1e1e;
+            --renk-metin: #e0e0e0;
+            --renk-rakam: #ffffff;
+            --renk-baslik: #d4af37;
+            --renk-soluk: #888888;
+            --renk-cerceve: #333333;
+            --renk-cizgi: #444444;
+            --logo-border: #d4af37;
+            --kutu-golge: rgba(0, 0, 0, 0.3);
+            --bant-bg: rgba(212, 175, 55, 0.85);
+            --bant-text: #000000;
+        }
+
+        .acik-tema {
+            --bg-body: #f2f4f8;
+            --bg-kutu: #ffffff;
+            --renk-metin: #333333;
+            --renk-rakam: #222222;
+            --renk-baslik: #0f2e5a;
+            --renk-soluk: #777777;
+            --renk-cerceve: #e0e0e0;
+            --renk-cizgi: #f0f0f0;
+            --logo-border: #0f2e5a;
+            --kutu-golge: rgba(0, 0, 0, 0.05);
+            --bant-bg: rgba(15, 46, 90, 0.85);
+            --bant-text: #ffffff;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--renk-metin);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 20px 60px;
+            /* Alt bandın kapanmaması için ekstra padding */
+            padding-bottom: 70px;
+            min-height: 100vh;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        .ust-bilgi {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg-kutu);
+            padding: 15px 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            gap: 20px;
+            border: 1px solid var(--renk-cerceve);
+            position: relative;
+            box-shadow: 0 4px 15px var(--kutu-golge);
+        }
+
+        .logo-placeholder {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #d4af37, #f3e5ab);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #fff;
+            border: 2px solid var(--logo-border);
+        }
+
+        .baslik {
+            color: var(--renk-baslik);
+            font-family: 'Georgia', serif;
+            font-size: 2.2em;
+            margin: 0;
+            font-weight: normal;
+        }
+
+        /* --- YENİ EKLENEN CANLI SAAT TASARIMI --- */
+        .zaman-paneli {
+            position: absolute;
+            left: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: var(--bg-body);
+            border: 1px solid var(--renk-cerceve);
+            padding: 8px 20px;
+            border-radius: 8px;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
+            /* İçeriye doğru hafif dijital ekran gölgesi */
+            transition: 0.4s ease;
+        }
+
+        .saat-kismi {
+            font-size: 1.8em;
+            font-weight: 900;
+            color: var(--renk-rakam);
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 1px;
+            line-height: 1;
+        }
+
+        .saat-kismi .saniye {
+            font-size: 0.55em;
+            /* Saniyeyi küçülttük */
+            color: var(--renk-soluk);
+            /* Rengini soluklaştırdık */
+            font-weight: 600;
+        }
+
+        .tarih-kismi {
+            font-size: 0.7em;
+            color: var(--renk-soluk);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 4px;
+            font-weight: bold;
+        }
+
+        #tema-butonu {
+            position: absolute;
+            right: 30px;
+            padding: 10px 20px;
+            background-color: var(--bg-body);
+            color: var(--renk-metin);
+            border: 1px solid var(--renk-cerceve);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        #ekran-icerik {
+            display: grid;
+            grid-template-columns: 1.6fr 1fr;
+            grid-template-rows: auto auto;
+            gap: 25px;
+            align-items: stretch;
+        }
+
+        .grup-karti {
+            background-color: var(--bg-kutu);
+            border-radius: 12px;
+            padding: 20px 25px;
+            border: 1px solid var(--renk-cerceve);
+            box-shadow: 0 4px 15px var(--kutu-golge);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .grup-karti[data-grup="Ziynet & Sarrafiye"] {
+            grid-column: 1 / 2;
+            grid-row: 1 / 3;
+        }
+
+        .grup-karti[data-grup="Piyasalar"] {
+            grid-column: 2 / 3;
+            grid-row: 1 / 2;
+        }
+
+        .grup-karti[data-grup="Gram Altın"] {
+            grid-column: 2 / 3;
+            grid-row: 2 / 3;
+        }
+
+        .grup-baslik {
+            color: var(--renk-baslik);
+            font-size: 1.6em;
+            margin-top: 0;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--renk-cizgi);
+            padding-bottom: 10px;
+            font-weight: normal;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            flex-grow: 1;
+        }
+
+        th {
+            color: var(--renk-soluk);
+            font-size: 0.95em;
+            font-weight: normal;
+            text-align: right;
+            padding: 12px 5px;
+            border-bottom: 1px solid var(--renk-cizgi);
+        }
+
+        th.sol {
+            text-align: left;
+        }
+
+        td {
+            font-size: 1.3em;
+            padding: 15px 5px;
+            text-align: right;
+            font-weight: bold;
+            color: var(--renk-rakam);
+            border-bottom: 1px solid var(--renk-cerceve);
+        }
+
+        td.isim-sutunu {
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        .isim-metni {
+            color: var(--renk-metin);
+            font-size: 1em;
+            font-weight: bold;
+            display: block;
+        }
+
+        .saat-metni {
+            font-size: 0.6em;
+            color: var(--renk-soluk);
+            font-weight: normal;
+            margin-top: 4px;
+            display: block;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        @keyframes flash-green {
+            0% {
+                background-color: rgba(40, 167, 69, 0.4);
+            }
+
+            100% {
+                background-color: transparent;
+            }
+        }
+
+        @keyframes flash-red {
+            0% {
+                background-color: rgba(220, 53, 69, 0.4);
+            }
+
+            100% {
+                background-color: transparent;
+            }
+        }
+
+        tr.artti td {
+            animation: flash-green 1.5s ease-out;
+        }
+
+        tr.dustu td {
+            animation: flash-red 1.5s ease-out;
+        }
+
+        /* --- YENİ EKLENEN KAYAN YAZI TASARIMI --- */
+        .alt-bant {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--bant-bg);
+            color: var(--bant-text);
+            padding: 10px 0;
+            font-size: 1.4em;
+            font-weight: bold;
+            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            /* YENİ: Arkada kalan tabloyu buzlu cam gibi gösterir */
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        @media (max-width: 900px) {
+            body {
+                padding: 15px 25px;
+                padding-bottom: 70px;
+            }
+
+            .ust-bilgi {
+                flex-direction: column;
+                text-align: center;
+                padding: 15px;
+            }
+
+            #saat {
+                position: static;
+                margin-bottom: 10px;
+            }
+
+            #tema-butonu {
+                position: static;
+                margin-top: 10px;
+            }
+
+            #ekran-icerik {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .grup-karti[data-grup="Ziynet & Sarrafiye"],
+            .grup-karti[data-grup="Piyasalar"],
+            .grup-karti[data-grup="Gram Altın"] {
+                grid-column: 1 / 2;
+                grid-row: auto;
+            }
+
+            td {
+                font-size: 0.95em;
+                padding: 10px 5px;
+            }
+
+            th {
+                font-size: 0.8em;
+                padding: 10px 5px;
+            }
+
+            .grup-karti {
+                overflow-x: auto;
+            }
+
+            .alt-bant {
+                font-size: 1.1em;
+                padding: 8px 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="ust-bilgi">
+        <div class="zaman-paneli">
+            <div class="saat-kismi" id="saat-metni">--:--<span class="saniye">:--</span></div>
+            <div class="tarih-kismi" id="tarih-metni">Yükleniyor...</div>
+        </div>
+
+        <div class="logo-placeholder">LOGO</div>
+        <h1 class="baslik">Gediz Sarraflar Derneği</h1>
+        <button id="tema-butonu">☀️ Açık Tema</button>
+    </div>
+
+    <div id="ekran-icerik">
+        <h2 style="text-align:center; color:var(--renk-soluk); grid-column: 1 / 3; align-self: center;">Fiyatlar
+            Piyasadan Yükleniyor...</h2>
+    </div>
+
+    <div class="alt-bant">
+        <marquee id="kayan-yazi-ekrani" scrollamount="8">Yükleniyor...</marquee>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        // --- YENİ CANLI SAAT VE TARİH KODU ---
+        function saatiGuncelle() {
+            const simdi = new Date();
+
+            // Saat ve Dakikayı al (Örn: 14:30)
+            const saatDakika = simdi.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+
+            // YENİ: Saniyeyi al, metne çevir ve 2 haneli değilse başına '0' ekle!
+            const saniye = String(simdi.getSeconds()).padStart(2, '0');
+
+            // Tarihi al (Örn: 23 Şubat 2026 Pazartesi)
+            const tarihSecenekleri = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const tarihStr = simdi.toLocaleDateString('tr-TR', tarihSecenekleri);
+
+            // Ekrana bas
+            document.getElementById('saat-metni').innerHTML = `${saatDakika}<span class="saniye">:${saniye}</span>`;
+            document.getElementById('tarih-metni').innerText = tarihStr;
+        }
+
+        setInterval(saatiGuncelle, 1000); // Her 1 saniyede bir saati güncelle
+        saatiGuncelle(); // Sayfa açılır açılmaz saati yaz
+
+        const temaButonu = document.getElementById("tema-butonu");
+        if (localStorage.getItem("seciliTema") === "acik") {
+            document.body.classList.add("acik-tema");
+            temaButonu.innerText = "🌙 Koyu Tema";
+        }
+        temaButonu.addEventListener("click", () => {
+            document.body.classList.toggle("acik-tema");
+            if (document.body.classList.contains("acik-tema")) {
+                temaButonu.innerText = "🌙 Koyu Tema";
+                localStorage.setItem("seciliTema", "acik");
+            } else {
+                temaButonu.innerText = "☀️ Açık Tema";
+                localStorage.setItem("seciliTema", "koyu");
+            }
+        });
+
+        const socket = io();
+        const formatla = (sayi) => new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(sayi);
+
+        let oncekiFiyatlar = {};
+
+        // --- KAYAN YAZIYI GÜNCELLEME KODU ---
+        socket.on("kayan_yazi_guncelle", (yeniYazi) => {
+            document.getElementById("kayan-yazi-ekrani").innerText = yeniYazi;
+        });
+
+        socket.on("guncel_fiyatlar", (grupluFiyatlar) => {
+            const ekranIcerik = document.getElementById("ekran-icerik");
+            ekranIcerik.innerHTML = "";
+            const grupSirasi = ["Ziynet & Sarrafiye", "Piyasalar", "Gram Altın"];
+
+            grupSirasi.forEach(grupAdi => {
+                const urunler = grupluFiyatlar[grupAdi];
+                if (!urunler || urunler.length === 0) return;
+
+                let html = `<div class="grup-karti" data-grup="${grupAdi}"><h2 class="grup-baslik">${grupAdi}</h2><table>`;
+
+                if (grupAdi === "Ziynet & Sarrafiye") {
+                    html += `<tr><th class="sol">ÜRÜN</th><th>YENİ ALIŞ</th><th>YENİ SATIŞ</th><th>ESKİ ALIŞ</th><th>ESKİ SATIŞ</th></tr>`;
+                    urunler.forEach(urun => {
+                        let yonSinifi = "";
+                        if (oncekiFiyatlar[urun.isim]) {
+                            if (urun.yeniSatis > oncekiFiyatlar[urun.isim]) yonSinifi = "artti";
+                            else if (urun.yeniSatis < oncekiFiyatlar[urun.isim]) yonSinifi = "dustu";
+                        }
+                        oncekiFiyatlar[urun.isim] = urun.yeniSatis;
+
+                        html += `<tr class="${yonSinifi}"><td class="isim-sutunu"><span class="isim-metni">${urun.isim}</span><span class="saat-metni">${urun.saat}</span></td><td>${formatla(urun.yeniAlis)}</td><td>${formatla(urun.yeniSatis)}</td><td>${formatla(urun.eskiAlis)}</td><td>${formatla(urun.eskiSatis)}</td></tr>`;
+                    });
+                } else {
+                    html += `<tr><th class="sol">BİRİM</th><th>ALIŞ</th><th>SATIŞ</th></tr>`;
+                    urunler.forEach(urun => {
+                        let yonSinifi = "";
+                        if (oncekiFiyatlar[urun.isim]) {
+                            if (urun.satis > oncekiFiyatlar[urun.isim]) yonSinifi = "artti";
+                            else if (urun.satis < oncekiFiyatlar[urun.isim]) yonSinifi = "dustu";
+                        }
+                        oncekiFiyatlar[urun.isim] = urun.satis;
+
+                        html += `<tr class="${yonSinifi}"><td class="isim-sutunu"><span class="isim-metni">${urun.isim}</span><span class="saat-metni">${urun.saat}</span></td><td>${formatla(urun.alis)}</td><td>${formatla(urun.satis)}</td></tr>`;
+                    });
+                }
+                html += `</table></div>`;
+                ekranIcerik.innerHTML += html;
+            });
+        });
+    </script>
+</body>
+
+</html>

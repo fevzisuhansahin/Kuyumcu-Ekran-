@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuyumcu Admin Paneli</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .kutu {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 600px;
+        }
+
+        h2 {
+            color: #0f2e5a;
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+        p.alt-yazi {
+            text-align: center;
+            color: #777;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+
+        input[type="password"],
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 16px;
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            background: #0f2e5a;
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #1a4a8c;
+        }
+
+        button.kaydet-btn {
+            background-color: #28a745;
+            margin-top: 25px;
+        }
+
+        button.kaydet-btn:hover {
+            background-color: #218838;
+        }
+
+        #admin-panel {
+            display: none;
+        }
+
+        .urun-ayar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .urun-isim {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #333;
+            width: 30%;
+        }
+
+        .fiyat-girdileri {
+            display: flex;
+            gap: 15px;
+            width: 70%;
+            justify-content: flex-end;
+        }
+
+        .ayar-grubu {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .ayar-grubu label {
+            font-size: 0.8em;
+            color: #777;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .ayar-grubu input {
+            width: 80px;
+            padding: 8px;
+            text-align: center;
+            font-weight: bold;
+            color: #0f2e5a;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+
+        .yazi-alani {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            margin-bottom: 20px;
+        }
+
+        .yazi-alani h3 {
+            margin-top: 0;
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        #bildirim {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #28a745;
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 16px;
+            position: fixed;
+            z-index: 1000;
+            right: 30px;
+            bottom: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transition: opacity 0.4s, transform 0.4s;
+            transform: translateY(20px);
+        }
+
+        #bildirim.goster {
+            visibility: visible;
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="kutu" id="login-ekrani">
+        <h2>Yetkili Girişi</h2>
+        <p class="alt-yazi">Sisteme girmek için şifrenizi yazın.</p>
+        <input type="password" id="sifre" placeholder="Şifrenizi girin..." autofocus
+            onkeypress="if(event.key === 'Enter') girisYap()">
+        <button onclick="girisYap()">Giriş Yap</button>
+    </div>
+
+    <div class="kutu" id="admin-panel">
+        <h2>Sistem Ayarları</h2>
+
+        <div class="yazi-alani">
+            <h3>📢 Ekran Altı Kayan Yazı</h3>
+            <input type="text" id="kayan_yazi_input" placeholder="Ekranda alt bantta geçecek mesajı yazın...">
+        </div>
+
+        <p class="alt-yazi" style="margin-bottom:10px;"><b>Fiyat Ayarları (+ / -)</b></p>
+
+        <div id="ayar-listesi"></div>
+
+        <button class="kaydet-btn" onclick="kaydet()">Tüm Değişiklikleri Ekrana Yansıt</button>
+    </div>
+
+    <div id="bildirim">✅ Ayarlar TV Ekranına Gönderildi!</div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        function girisYap() {
+            const sifre = document.getElementById("sifre").value;
+            socket.emit("admin_giris_yap", sifre);
+        }
+
+        socket.on("giris_hatali", () => {
+            alert("Hatalı şifre girdiniz!");
+            document.getElementById("sifre").value = "";
+        });
+
+        socket.on("giris_basarili", (data) => {
+            document.getElementById("login-ekrani").style.display = "none";
+            document.getElementById("admin-panel").style.display = "block";
+
+            // Kayan yazıyı doldur
+            document.getElementById("kayan_yazi_input").value = data.kayanYazi;
+
+            const listeDiv = document.getElementById("ayar-listesi");
+            listeDiv.innerHTML = "";
+
+            data.ayarlar.forEach(urun => {
+                listeDiv.innerHTML += `
+                    <div class="urun-ayar">
+                        <span class="urun-isim">${urun.isim}</span>
+                        <div class="fiyat-girdileri">
+                            <div class="ayar-grubu">
+                                <label>Alışa Ekle</label>
+                                <input type="number" id="alis_${urun.kod}" value="${urun.alisAyar}">
+                            </div>
+                            <div class="ayar-grubu">
+                                <label>Satışa Ekle</label>
+                                <input type="number" id="satis_${urun.kod}" value="${urun.satisAyar}">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        });
+
+        function kaydet() {
+            const alisInputlari = document.querySelectorAll('input[id^="alis_"]');
+            let fiyatlar = {};
+
+            alisInputlari.forEach(input => {
+                let urunKodu = input.id.replace("alis_", "");
+                let satisInput = document.getElementById("satis_" + urunKodu);
+                fiyatlar[urunKodu] = { alisAyar: Number(input.value), satisAyar: Number(satisInput.value) };
+            });
+
+            const kayanYaziMetni = document.getElementById("kayan_yazi_input").value;
+
+            // Fiyatları ve Kayan yazıyı paketleyip gönderiyoruz
+            socket.emit("ayarlari_guncelle", { fiyatlar: fiyatlar, kayanYazi: kayanYaziMetni });
+
+            const bildirimDiv = document.getElementById("bildirim");
+            bildirimDiv.classList.add("goster");
+            setTimeout(() => { bildirimDiv.classList.remove("goster"); }, 3000);
+        }
+    </script>
+</body>
+
+</html>
