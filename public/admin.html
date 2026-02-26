@@ -17,11 +17,24 @@
             --renk-cerceve: #333333;
             --renk-cizgi: #444444;
             --logo-border: #d4af37;
-            --kutu-golge: rgba(0, 0, 0, 0.5);
-            --input-bg: rgba(255, 255, 255, 0.05);
-            --btn-bg: #d4af37;
-            --btn-text: #121212;
-            --btn-hover: #bda030;
+            --kutu-golge: rgba(0, 0, 0, 0.3);
+            --bant-bg: rgba(212, 175, 55, 0.85);
+            --bant-text: #000000;
+        }
+
+        .acik-tema {
+            --bg-body: #f2f4f8;
+            --bg-kutu: #ffffff;
+            --renk-metin: #333333;
+            --renk-rakam: #222222;
+            --renk-baslik: #0f2e5a;
+            --renk-soluk: #777777;
+            --renk-cerceve: #e0e0e0;
+            --renk-cizgi: #f0f0f0;
+            --logo-border: #0f2e5a;
+            --kutu-golge: rgba(0, 0, 0, 0.05);
+            --bant-bg: rgba(15, 46, 90, 0.85);
+            --bant-text: #ffffff;
         }
 
         body {
@@ -29,14 +42,15 @@
             color: var(--renk-metin);
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
-            padding: 20px 40px;
+            padding: 20px 60px;
             min-height: 100vh;
+            box-sizing: border-box;
             display: flex;
             flex-direction: column;
-            align-items: center;
+            transition: background-color 0.4s ease, color 0.4s ease;
         }
 
-        /* --- Üst Bilgi (Header) --- */
+        /* --- ÜST BİLGİ VE SAAT TASARIMI (Birebir Aynı) --- */
         .ust-bilgi {
             display: flex;
             align-items: center;
@@ -44,53 +58,138 @@
             background-color: var(--bg-kutu);
             padding: 15px 30px;
             border-radius: 10px;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             gap: 20px;
             border: 1px solid var(--renk-cerceve);
+            position: relative;
             box-shadow: 0 4px 15px var(--kutu-golge);
-            width: 100%;
-            max-width: 900px;
-            box-sizing: border-box;
+        }
+
+        .zaman-paneli {
+            position: absolute;
+            left: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: var(--bg-body);
+            border: 1px solid var(--renk-cerceve);
+            padding: 8px 20px;
+            border-radius: 8px;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .saat-kismi {
+            font-size: 1.8em;
+            font-weight: 900;
+            color: var(--renk-rakam);
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 1px;
+            line-height: 1;
+        }
+
+        .saat-kismi .saniye {
+            font-size: 0.55em;
+            color: var(--renk-soluk);
+            font-weight: 600;
+        }
+
+        .tarih-kismi {
+            font-size: 0.7em;
+            color: var(--renk-soluk);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 4px;
+            font-weight: bold;
         }
 
         .logo-placeholder {
-            width: 50px;
-            height: 50px;
+            width: 60px;
+            height: 60px;
             background: linear-gradient(135deg, #d4af37, #f3e5ab);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            color: #121212;
+            color: #fff;
             border: 2px solid var(--logo-border);
-            font-size: 0.8em;
         }
 
         .baslik {
             color: var(--renk-baslik);
             font-family: 'Georgia', serif;
-            font-size: 1.8em;
+            font-size: 2.2em;
             margin: 0;
             font-weight: normal;
         }
 
-        /* --- Kart ve Tablo Tasarımı --- */
+        #tema-butonu {
+            position: absolute;
+            right: 30px;
+            padding: 10px 20px;
+            background-color: var(--bg-body);
+            color: var(--renk-metin);
+            border: 1px solid var(--renk-cerceve);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        /* --- IZGARA (GRID) YAPISI --- */
+        #ekran-icerik {
+            display: grid;
+            grid-template-columns: 1.6fr 1fr;
+            grid-template-rows: auto auto auto auto;
+            gap: 25px;
+            align-items: stretch;
+            display: none;
+            /* Giriş yapana kadar gizli */
+        }
+
         .grup-karti {
             background-color: var(--bg-kutu);
             border-radius: 12px;
-            padding: 25px 35px;
+            padding: 20px 25px;
             border: 1px solid var(--renk-cerceve);
             box-shadow: 0 4px 15px var(--kutu-golge);
-            width: 100%;
-            max-width: 900px;
-            box-sizing: border-box;
-            margin-bottom: 25px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .karti-tam-genislik {
+            grid-column: 1 / 3;
+            grid-row: 1 / 2;
+        }
+
+        .grup-karti[data-grup="Ziynet & Sarrafiye"] {
+            grid-column: 1 / 2;
+            grid-row: 2 / 4;
+        }
+
+        .grup-karti[data-grup="Piyasalar"] {
+            grid-column: 2 / 3;
+            grid-row: 2 / 3;
+        }
+
+        .grup-karti[data-grup="Gram Altın"] {
+            grid-column: 2 / 3;
+            grid-row: 3 / 4;
+        }
+
+        .karti-buton {
+            grid-column: 1 / 3;
+            grid-row: 4 / 5;
+            padding: 0;
+            /* Buton kartında padding istemiyoruz */
+            background: transparent;
+            border: none;
+            box-shadow: none;
         }
 
         .grup-baslik {
             color: var(--renk-baslik);
-            font-size: 1.4em;
+            font-size: 1.6em;
             margin-top: 0;
             margin-bottom: 20px;
             border-bottom: 1px solid var(--renk-cizgi);
@@ -98,17 +197,19 @@
             font-weight: normal;
         }
 
+        /* --- TABLO TASARIMI --- */
         table {
             width: 100%;
             border-collapse: collapse;
+            flex-grow: 1;
         }
 
         th {
             color: var(--renk-soluk);
-            font-size: 0.9em;
+            font-size: 0.95em;
             font-weight: normal;
             text-align: right;
-            padding: 12px 10px;
+            padding: 12px 5px;
             border-bottom: 1px solid var(--renk-cizgi);
         }
 
@@ -117,7 +218,7 @@
         }
 
         td {
-            padding: 12px 10px;
+            padding: 12px 5px;
             text-align: right;
             border-bottom: 1px solid var(--renk-cerceve);
             vertical-align: middle;
@@ -125,7 +226,7 @@
 
         td.isim-sutunu {
             text-align: left;
-            font-size: 1.2em;
+            font-size: 1.1em;
             font-weight: bold;
             color: var(--renk-metin);
         }
@@ -134,65 +235,64 @@
             border-bottom: none;
         }
 
-        /* --- İnputlar (Kutu İçleri) --- */
-        input[type="number"],
-        input[type="text"],
-        input[type="password"] {
-            background-color: var(--input-bg);
-            border: 1px dashed var(--renk-cizgi);
+        /* --- İNPUT (GİRDİ) TASARIMLARI --- */
+        input.fiyat-input {
+            background-color: transparent;
+            border: 1px solid var(--renk-cizgi);
             color: var(--renk-rakam);
             font-size: 1.2em;
             font-weight: bold;
-            text-align: center;
-            padding: 10px;
+            text-align: right;
+            padding: 8px 10px;
             border-radius: 6px;
-            width: 120px;
+            width: 110px;
             outline: none;
             transition: 0.3s;
-            font-family: monospace;
-        }
-
-        input[type="text"] {
-            width: 100%;
-            text-align: left;
             font-family: inherit;
-            font-weight: normal;
-            font-size: 1em;
         }
 
-        input[type="password"] {
-            width: 100%;
-            text-align: center;
-        }
-
-        input[type="number"]:focus,
-        input[type="text"]:focus,
-        input[type="password"]:focus {
+        input.fiyat-input:focus {
             border-color: var(--renk-baslik);
-            background-color: rgba(212, 175, 55, 0.1);
+            background-color: rgba(212, 175, 55, 0.05);
         }
 
-        /* --- Butonlar --- */
-        button {
-            background-color: var(--btn-bg);
-            color: var(--btn-text);
-            border: none;
-            padding: 15px 25px;
-            font-size: 1.1em;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: 0.3s;
+        input.yazi-input {
             width: 100%;
-            margin-top: 15px;
+            background-color: transparent;
+            border: 1px dashed var(--renk-cizgi);
+            color: var(--renk-metin);
+            padding: 15px;
+            font-size: 1.1em;
+            border-radius: 8px;
+            outline: none;
+            box-sizing: border-box;
+            transition: 0.3s;
         }
 
-        button:hover {
-            background-color: var(--btn-hover);
+        input.yazi-input:focus {
+            border-color: var(--renk-baslik);
+        }
+
+        /* --- BUTON VE BİLDİRİM --- */
+        .kaydet-btn {
+            background-color: #28a745;
+            color: white;
+            font-size: 1.4em;
+            font-weight: bold;
+            padding: 20px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            width: 100%;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .kaydet-btn:hover {
+            background-color: #218838;
             transform: translateY(-2px);
         }
 
-        /* --- Bildirim --- */
         #bildirim {
             visibility: hidden;
             min-width: 300px;
@@ -204,6 +304,7 @@
             position: fixed;
             z-index: 1000;
             top: 30px;
+            right: 30px;
             font-size: 1.1em;
             font-weight: bold;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
@@ -218,81 +319,157 @@
             transform: translateY(0);
         }
 
-        #admin-panel {
-            display: none;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        /* --- GİRİŞ EKRANI KARTI --- */
+        #login-ekrani {
+            max-width: 400px;
+            margin: 50px auto;
+            text-align: center;
         }
 
-        .gizli {
-            display: none !important;
+        #login-ekrani input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--renk-cerceve);
+            background: transparent;
+            color: var(--renk-rakam);
+            font-size: 1.2em;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        #login-ekrani button {
+            background-color: var(--renk-baslik);
+            color: #000;
+            padding: 15px;
+            width: 100%;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.2em;
+            cursor: pointer;
         }
     </style>
 </head>
 
 <body>
 
-    <div id="bildirim">✅ Ayarlar Başarıyla Ekrana Gönderildi!</div>
+    <div id="bildirim">✅ Ayarlar TV Ekranına Gönderildi!</div>
 
     <div class="ust-bilgi">
+        <div class="zaman-paneli">
+            <div class="saat-kismi" id="saat-metni">--:--<span class="saniye">:--</span></div>
+            <div class="tarih-kismi" id="tarih-metni">Yükleniyor...</div>
+        </div>
         <div class="logo-placeholder">PANEL</div>
         <h1 class="baslik">Gediz Sarraflar Derneği - Yönetim</h1>
+        <button id="tema-butonu">☀️ Açık Tema</button>
     </div>
 
-    <div class="grup-karti" id="login-ekrani" style="max-width: 400px; text-align: center;">
-        <h2 class="grup-baslik" style="border:none; text-align:center;">Yetkili Girişi</h2>
-        <input type="password" id="sifre" placeholder="Şifrenizi girin..." autofocus
+    <div class="grup-karti" id="login-ekrani">
+        <h2 class="grup-baslik" style="border:none; margin-bottom: 10px;">Yetkili Girişi</h2>
+        <p style="color: var(--renk-soluk); margin-bottom: 20px;">Sistemi yönetmek için şifrenizi girin.</p>
+        <input type="password" id="sifre" placeholder="Şifre..." autofocus
             onkeypress="if(event.key === 'Enter') girisYap()">
         <button onclick="girisYap()">Sistemi Aç</button>
     </div>
 
-    <div id="admin-panel" class="gizli">
+    <div id="ekran-icerik">
 
-        <div class="grup-karti">
+        <div class="grup-karti karti-tam-genislik">
             <h2 class="grup-baslik">📢 Ekran Altı Kayan Yazı</h2>
-            <input type="text" id="kayan_yazi_input" placeholder="Ekranda alt bantta geçecek mesajı yazın...">
+            <input type="text" id="kayan_yazi_input" class="yazi-input"
+                placeholder="Ekranda alt bantta geçecek mesajı yazın...">
         </div>
 
-        <div class="grup-karti">
-            <h2 class="grup-baslik">Canlı Fiyat Ayarları (TV'deki Güncel Rakamlar)</h2>
+        <div class="grup-karti" data-grup="Ziynet & Sarrafiye">
+            <h2 class="grup-baslik">Ziynet & Sarrafiye</h2>
             <table>
                 <thead>
                     <tr>
                         <th class="sol">ÜRÜN</th>
-                        <th>EKRANDAKİ ALIŞ</th>
-                        <th>EKRANDAKİ SATIŞ</th>
+                        <th>ALIŞ FİYATI</th>
+                        <th>SATIŞ FİYATI</th>
                     </tr>
                 </thead>
-                <tbody id="ayar-listesi-body">
-                </tbody>
+                <tbody id="tbody-ziynet"></tbody>
             </table>
         </div>
 
-        <div style="width: 100%; max-width: 900px;">
-            <button onclick="kaydet()" style="font-size: 1.3em; padding: 20px;">Tüm Değişiklikleri Ekrana
-                Yansıt</button>
+        <div class="grup-karti" data-grup="Piyasalar">
+            <h2 class="grup-baslik">Piyasalar</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th class="sol">BİRİM</th>
+                        <th>ALIŞ FİYATI</th>
+                        <th>SATIŞ FİYATI</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-piyasa"></tbody>
+            </table>
+        </div>
+
+        <div class="grup-karti" data-grup="Gram Altın">
+            <h2 class="grup-baslik">Gram Altın</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th class="sol">BİRİM</th>
+                        <th>ALIŞ FİYATI</th>
+                        <th>SATIŞ FİYATI</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-gram"></tbody>
+            </table>
+        </div>
+
+        <div class="grup-karti karti-buton" data-grup="Kaydet">
+            <button class="kaydet-btn" onclick="kaydet()">Tüm Değişiklikleri Ekrana Yansıt</button>
         </div>
 
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        const socket = io();
-        let sonCanliFiyatlar = {}; // TV'de dönen anlık fiyatları burada tutacağız
+        // --- SAAT VE TEMA MANTIĞI (TV EKRANI İLE BİREBİR AYNI) ---
+        function saatiGuncelle() {
+            const simdi = new Date();
+            const saatDakika = simdi.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+            const saniye = String(simdi.getSeconds()).padStart(2, '0');
+            const tarihSecenekleri = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const tarihStr = simdi.toLocaleDateString('tr-TR', tarihSecenekleri);
+            document.getElementById('saat-metni').innerHTML = `${saatDakika}<span class="saniye">:${saniye}</span>`;
+            document.getElementById('tarih-metni').innerText = tarihStr;
+        }
+        setInterval(saatiGuncelle, 1000); saatiGuncelle();
 
-        // 1. SİHİRBAZLIK: Arka planda TV'ye giden verileri gizlice dinleyip cebimize koyuyoruz
+        const temaButonu = document.getElementById("tema-butonu");
+        if (localStorage.getItem("seciliTema") === "acik") {
+            document.body.classList.add("acik-tema");
+            temaButonu.innerText = "🌙 Koyu Tema";
+        }
+        temaButonu.addEventListener("click", () => {
+            document.body.classList.toggle("acik-tema");
+            if (document.body.classList.contains("acik-tema")) {
+                temaButonu.innerText = "🌙 Koyu Tema";
+                localStorage.setItem("seciliTema", "acik");
+            } else {
+                temaButonu.innerText = "☀️ Açık Tema";
+                localStorage.setItem("seciliTema", "koyu");
+            }
+        });
+
+        // --- SOKET VE VERİ YÖNETİMİ ---
+        const socket = io();
+        let sonCanliFiyatlar = {};
+
+        // Arka planda TV'ye giden verileri gizlice dinliyoruz
         socket.on("guncel_fiyatlar", (tvVerisi) => {
-            if (tvVerisi["Ziynet & Sarrafiye"]) {
-                tvVerisi["Ziynet & Sarrafiye"].forEach(item => sonCanliFiyatlar[item.isim] = { alis: item.yeniAlis, satis: item.yeniSatis });
-            }
-            if (tvVerisi["Gram Altın"]) {
-                tvVerisi["Gram Altın"].forEach(item => sonCanliFiyatlar[item.isim] = { alis: item.alis, satis: item.satis });
-            }
-            if (tvVerisi["Piyasalar"]) {
-                tvVerisi["Piyasalar"].forEach(item => sonCanliFiyatlar[item.isim] = { alis: item.alis, satis: item.satis });
-            }
+            if (tvVerisi["Ziynet & Sarrafiye"]) tvVerisi["Ziynet & Sarrafiye"].forEach(item => sonCanliFiyatlar[item.isim] = { alis: item.yeniAlis, satis: item.yeniSatis });
+            if (tvVerisi["Gram Altın"]) tvVerisi["Gram Altın"].forEach(item => sonCanliFiyatlar[item.isim] = { alis: item.alis, satis: item.satis });
+            if (tvVerisi["Piyasalar"]) tvVerisi["Piyasalar"].forEach(item => sonCanliFiyatlar[item.isim] = { alis: item.alis, satis: item.satis });
         });
 
         function girisYap() {
@@ -306,33 +483,36 @@
         });
 
         socket.on("giris_basarili", (data) => {
-            document.getElementById("login-ekrani").classList.add("gizli");
-            document.getElementById("admin-panel").classList.remove("gizli");
+            document.getElementById("login-ekrani").style.display = "none";
+            document.getElementById("ekran-icerik").style.display = "grid"; // Izgarayı aç
 
-            // Kayan yazıyı doldur
             document.getElementById("kayan_yazi_input").value = data.kayanYazi;
 
-            const listeTbody = document.getElementById("ayar-listesi-body");
-            listeTbody.innerHTML = "";
+            // Hangi ürünün hangi tabloya ait olduğunu belirleyen sözlük
+            const gruplar = {
+                "CEYREK": "ziynet", "YARIM": "ziynet", "TAM": "ziynet", "GREMSE": "ziynet", "ATA": "ziynet",
+                "ALTIN": "piyasa", "GUMUSTRY": "piyasa",
+                "KULCEALTIN": "gram"
+            };
+
+            // Tabloları temizle
+            document.getElementById("tbody-ziynet").innerHTML = "";
+            document.getElementById("tbody-piyasa").innerHTML = "";
+            document.getElementById("tbody-gram").innerHTML = "";
 
             data.ayarlar.forEach(urun => {
-                // TV'deki anlık fiyatı al (Eğer ilk saniye boşsa 0 kabul et)
                 let guncel = sonCanliFiyatlar[urun.isim] || { alis: 0, satis: 0 };
-
-                // İKİNCİ SİHİRBAZLIK: Matematiksel olarak sistemin Ham Fiyatını buluyoruz
                 let baseAlis = guncel.alis - urun.alisAyar;
                 let baseSatis = guncel.satis - urun.satisAyar;
 
-                // Ekrana Tablo Satırı (TR) Olarak Basıyoruz
-                listeTbody.innerHTML += `
+                let hedefTablo = gruplar[urun.kod];
+                if (!hedefTablo) return;
+
+                document.getElementById("tbody-" + hedefTablo).innerHTML += `
                     <tr class="urun-ayar" data-kod="${urun.kod}" data-base-alis="${baseAlis}" data-base-satis="${baseSatis}">
                         <td class="isim-sutunu">${urun.isim}</td>
-                        <td>
-                            <input type="number" step="50" id="alis_${urun.kod}" value="${guncel.alis}">
-                        </td>
-                        <td>
-                            <input type="number" step="50" id="satis_${urun.kod}" value="${guncel.satis}">
-                        </td>
+                        <td><input type="number" step="50" class="fiyat-input" id="alis_${urun.kod}" value="${guncel.alis}"></td>
+                        <td><input type="number" step="50" class="fiyat-input" id="satis_${urun.kod}" value="${guncel.satis}"></td>
                     </tr>
                 `;
             });
@@ -340,32 +520,19 @@
 
         function kaydet() {
             let fiyatlar = {};
-            const satirlar = document.querySelectorAll(".urun-ayar");
-
-            satirlar.forEach(satir => {
+            document.querySelectorAll(".urun-ayar").forEach(satir => {
                 let kod = satir.getAttribute("data-kod");
-
-                // Sakladığımız ham fiyatları geri çağırıyoruz
                 let baseAlis = Number(satir.getAttribute("data-base-alis"));
                 let baseSatis = Number(satir.getAttribute("data-base-satis"));
-
-                // Müşterinin kutuya yazdığı yeni final fiyatı alıyoruz
                 let inputAlis = Number(document.getElementById("alis_" + kod).value);
                 let inputSatis = Number(document.getElementById("satis_" + kod).value);
 
-                // ÜÇÜNCÜ SİHİRBAZLIK: Sunucuya göndereceğimiz YENİ AYAR
-                let yeniAlisAyar = inputAlis - baseAlis;
-                let yeniSatisAyar = inputSatis - baseSatis;
-
-                fiyatlar[kod] = { alisAyar: yeniAlisAyar, satisAyar: yeniSatisAyar };
+                fiyatlar[kod] = { alisAyar: inputAlis - baseAlis, satisAyar: inputSatis - baseSatis };
             });
 
             const kayanYaziMetni = document.getElementById("kayan_yazi_input").value;
-
-            // Arka planda her şey aynı formata dönüştü
             socket.emit("ayarlari_guncelle", { fiyatlar: fiyatlar, kayanYazi: kayanYaziMetni });
 
-            // Başarı bildirimi göster
             const bildirimDiv = document.getElementById("bildirim");
             bildirimDiv.classList.add("goster");
             setTimeout(() => { bildirimDiv.classList.remove("goster"); }, 3000);
