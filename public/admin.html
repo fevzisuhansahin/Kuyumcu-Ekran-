@@ -20,6 +20,7 @@
             --kutu-golge: rgba(0, 0, 0, 0.3);
             --bant-bg: rgba(212, 175, 55, 0.85);
             --bant-text: #000000;
+            --login-btn-text: #000000;
         }
 
         .acik-tema {
@@ -35,6 +36,7 @@
             --kutu-golge: rgba(0, 0, 0, 0.05);
             --bant-bg: rgba(15, 46, 90, 0.85);
             --bant-text: #ffffff;
+            --login-btn-text: #ffffff;
         }
 
         body {
@@ -341,7 +343,7 @@
 
         #login-ekrani button {
             background-color: var(--renk-baslik);
-            color: #000;
+            color: var(--login-btn-text);
             padding: 15px;
             width: 100%;
             border: none;
@@ -350,12 +352,67 @@
             font-size: 1.2em;
             cursor: pointer;
         }
+
+        /* --- MOBİL VE KÜÇÜK EKRAN UYUMU (İÇ İÇE GİRMEYİ ÖNLER) --- */
+        @media (max-width: 1100px) {
+            body {
+                padding: 15px 15px 70px 15px;
+            }
+
+            .ust-bilgi {
+                flex-direction: column;
+                padding: 20px;
+                gap: 15px;
+                text-align: center;
+            }
+
+            /* Saat ve Tema butonunun çivilerini söküyoruz, alt alta dizilmelerini sağlıyoruz */
+            .zaman-paneli,
+            #tema-butonu {
+                position: static;
+                width: 100%;
+                max-width: 250px;
+                margin: 0 auto;
+            }
+
+            .baslik {
+                font-size: 1.6em;
+            }
+
+            /* Izgara (Grid) yapısını tek sütuna düşürür */
+            #ekran-icerik {
+                grid-template-columns: 1fr;
+            }
+
+            /* Tüm kartları tam ekran genişliğine yayar */
+            .grup-karti,
+            .karti-tam-genislik {
+                grid-column: 1 / -1 !important;
+                grid-row: auto !important;
+                overflow-x: auto;
+                /* Tablo taşarsa sağa kaydırma çubuğu çıkarır */
+                padding: 15px;
+            }
+
+            td {
+                font-size: 1em;
+                padding: 10px 5px;
+            }
+
+            th {
+                font-size: 0.8em;
+            }
+
+            .alt-bant {
+                font-size: 1.1em;
+            }
+        }
     </style>
 </head>
 
 <body>
 
-    <div id="bildirim">✅ Ayarlar TV Ekranına Gönderildi!</div>
+    <div id="bildirim">✅ Ayarlar Ekrana Gönderildi!</div>
 
     <div class="ust-bilgi">
         <div class="zaman-paneli">
