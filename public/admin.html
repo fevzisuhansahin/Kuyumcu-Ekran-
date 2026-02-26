@@ -6,144 +6,196 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Yönetim Paneli</title>
     <style>
+        /* TV Ekranındaki Tema Değişkenleri Birebir Aynı */
+        :root {
+            --bg-body: #121212;
+            --bg-kutu: #1e1e1e;
+            --renk-metin: #e0e0e0;
+            --renk-rakam: #ffffff;
+            --renk-baslik: #d4af37;
+            --renk-soluk: #888888;
+            --renk-cerceve: #333333;
+            --renk-cizgi: #444444;
+            --logo-border: #d4af37;
+            --kutu-golge: rgba(0, 0, 0, 0.5);
+            --input-bg: rgba(255, 255, 255, 0.05);
+            --btn-bg: #d4af37;
+            --btn-text: #121212;
+            --btn-hover: #bda030;
+        }
+
         body {
-            font-family: 'Segoe UI', sans-serif;
-            background: #f4f7f6;
+            background-color: var(--bg-body);
+            color: var(--renk-metin);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            padding: 20px 40px;
             min-height: 100vh;
-        }
-
-        .kutu {
-            background: white;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            width: 100%;
-            max-width: 600px;
-        }
-
-        h2 {
-            color: #0f2e5a;
-            text-align: center;
-            margin-top: 0;
-            margin-bottom: 10px;
-        }
-
-        p.alt-yazi {
-            text-align: center;
-            color: #777;
-            margin-bottom: 30px;
-            font-size: 0.9em;
-        }
-
-        input[type="password"],
-        input[type="text"] {
-            width: 100%;
-            padding: 12px 15px;
-            margin-bottom: 20px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-sizing: border-box;
-            font-size: 16px;
-            outline: none;
-        }
-
-        button {
-            width: 100%;
-            background: #0f2e5a;
-            color: white;
-            padding: 14px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        button:hover {
-            background: #1a4a8c;
-        }
-
-        button.kaydet-btn {
-            background-color: #28a745;
-            margin-top: 25px;
-        }
-
-        button.kaydet-btn:hover {
-            background-color: #218838;
-        }
-
-        #admin-panel {
-            display: none;
-        }
-
-        .urun-ayar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 0;
-            border-bottom: 1px solid #eee;
-        }
-
-        .urun-isim {
-            font-weight: bold;
-            font-size: 1.1em;
-            color: #333;
-            width: 30%;
-        }
-
-        .fiyat-girdileri {
-            display: flex;
-            gap: 15px;
-            width: 70%;
-            justify-content: flex-end;
-        }
-
-        .ayar-grubu {
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
-        .ayar-grubu label {
+        /* --- Üst Bilgi (Header) --- */
+        .ust-bilgi {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg-kutu);
+            padding: 15px 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            gap: 20px;
+            border: 1px solid var(--renk-cerceve);
+            box-shadow: 0 4px 15px var(--kutu-golge);
+            width: 100%;
+            max-width: 900px;
+            box-sizing: border-box;
+        }
+
+        .logo-placeholder {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #d4af37, #f3e5ab);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #121212;
+            border: 2px solid var(--logo-border);
             font-size: 0.8em;
-            color: #777;
-            margin-bottom: 5px;
-            font-weight: bold;
         }
 
-        .ayar-grubu input {
-            width: 90px;
-            padding: 8px;
-            text-align: center;
-            font-weight: bold;
-            color: #0f2e5a;
-            border: 1px solid #ddd;
-            border-radius: 6px;
+        .baslik {
+            color: var(--renk-baslik);
+            font-family: 'Georgia', serif;
+            font-size: 1.8em;
+            margin: 0;
+            font-weight: normal;
         }
 
-        .yazi-alani {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #e9ecef;
-            margin-bottom: 20px;
+        /* --- Kart ve Tablo Tasarımı --- */
+        .grup-karti {
+            background-color: var(--bg-kutu);
+            border-radius: 12px;
+            padding: 25px 35px;
+            border: 1px solid var(--renk-cerceve);
+            box-shadow: 0 4px 15px var(--kutu-golge);
+            width: 100%;
+            max-width: 900px;
+            box-sizing: border-box;
+            margin-bottom: 25px;
         }
 
-        .yazi-alani h3 {
+        .grup-baslik {
+            color: var(--renk-baslik);
+            font-size: 1.4em;
             margin-top: 0;
-            color: #333;
-            font-size: 1.1em;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--renk-cizgi);
+            padding-bottom: 10px;
+            font-weight: normal;
         }
 
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            color: var(--renk-soluk);
+            font-size: 0.9em;
+            font-weight: normal;
+            text-align: right;
+            padding: 12px 10px;
+            border-bottom: 1px solid var(--renk-cizgi);
+        }
+
+        th.sol {
+            text-align: left;
+        }
+
+        td {
+            padding: 12px 10px;
+            text-align: right;
+            border-bottom: 1px solid var(--renk-cerceve);
+            vertical-align: middle;
+        }
+
+        td.isim-sutunu {
+            text-align: left;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--renk-metin);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* --- İnputlar (Kutu İçleri) --- */
+        input[type="number"],
+        input[type="text"],
+        input[type="password"] {
+            background-color: var(--input-bg);
+            border: 1px dashed var(--renk-cizgi);
+            color: var(--renk-rakam);
+            font-size: 1.2em;
+            font-weight: bold;
+            text-align: center;
+            padding: 10px;
+            border-radius: 6px;
+            width: 120px;
+            outline: none;
+            transition: 0.3s;
+            font-family: monospace;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            text-align: left;
+            font-family: inherit;
+            font-weight: normal;
+            font-size: 1em;
+        }
+
+        input[type="password"] {
+            width: 100%;
+            text-align: center;
+        }
+
+        input[type="number"]:focus,
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            border-color: var(--renk-baslik);
+            background-color: rgba(212, 175, 55, 0.1);
+        }
+
+        /* --- Butonlar --- */
+        button {
+            background-color: var(--btn-bg);
+            color: var(--btn-text);
+            border: none;
+            padding: 15px 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        button:hover {
+            background-color: var(--btn-hover);
+            transform: translateY(-2px);
+        }
+
+        /* --- Bildirim --- */
         #bildirim {
             visibility: hidden;
-            min-width: 250px;
+            min-width: 300px;
             background-color: #28a745;
             color: #fff;
             text-align: center;
@@ -151,14 +203,13 @@
             padding: 16px;
             position: fixed;
             z-index: 1000;
-            right: 30px;
-            bottom: 30px;
-            font-size: 16px;
+            top: 30px;
+            font-size: 1.1em;
             font-weight: bold;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             opacity: 0;
             transition: opacity 0.4s, transform 0.4s;
-            transform: translateY(20px);
+            transform: translateY(-20px);
         }
 
         #bildirim.goster {
@@ -166,34 +217,65 @@
             opacity: 1;
             transform: translateY(0);
         }
+
+        #admin-panel {
+            display: none;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .gizli {
+            display: none !important;
+        }
     </style>
 </head>
 
 <body>
-    <div class="kutu" id="login-ekrani">
-        <h2>Yetkili Girişi</h2>
-        <p class="alt-yazi">Sisteme girmek için şifrenizi yazın.</p>
-        <input type="password" id="sifre" placeholder="Şifrenizi girin..." autofocus
-            onkeypress="if(event.key === 'Enter') girisYap()">
-        <button onclick="girisYap()">Giriş Yap</button>
+
+    <div id="bildirim">✅ Ayarlar Başarıyla Ekrana Gönderildi!</div>
+
+    <div class="ust-bilgi">
+        <div class="logo-placeholder">PANEL</div>
+        <h1 class="baslik">Gediz Sarraflar Derneği - Yönetim</h1>
     </div>
 
-    <div class="kutu" id="admin-panel">
-        <h2>Sistem Ayarları</h2>
+    <div class="grup-karti" id="login-ekrani" style="max-width: 400px; text-align: center;">
+        <h2 class="grup-baslik" style="border:none; text-align:center;">Yetkili Girişi</h2>
+        <input type="password" id="sifre" placeholder="Şifrenizi girin..." autofocus
+            onkeypress="if(event.key === 'Enter') girisYap()">
+        <button onclick="girisYap()">Sistemi Aç</button>
+    </div>
 
-        <div class="yazi-alani">
-            <h3>📢 Ekran Altı Kayan Yazı</h3>
+    <div id="admin-panel" class="gizli">
+
+        <div class="grup-karti">
+            <h2 class="grup-baslik">📢 Ekran Altı Kayan Yazı</h2>
             <input type="text" id="kayan_yazi_input" placeholder="Ekranda alt bantta geçecek mesajı yazın...">
         </div>
 
-        <p class="alt-yazi" style="margin-bottom:10px;"><b>Canlı Fiyat Ayarları (TV'deki Güncel Rakamlar)</b></p>
+        <div class="grup-karti">
+            <h2 class="grup-baslik">Canlı Fiyat Ayarları (TV'deki Güncel Rakamlar)</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th class="sol">ÜRÜN</th>
+                        <th>EKRANDAKİ ALIŞ</th>
+                        <th>EKRANDAKİ SATIŞ</th>
+                    </tr>
+                </thead>
+                <tbody id="ayar-listesi-body">
+                </tbody>
+            </table>
+        </div>
 
-        <div id="ayar-listesi"></div>
+        <div style="width: 100%; max-width: 900px;">
+            <button onclick="kaydet()" style="font-size: 1.3em; padding: 20px;">Tüm Değişiklikleri Ekrana
+                Yansıt</button>
+        </div>
 
-        <button class="kaydet-btn" onclick="kaydet()">Tüm Değişiklikleri Ekrana Yansıt</button>
     </div>
-
-    <div id="bildirim">✅ Ayarlar TV Ekranına Gönderildi!</div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
@@ -224,38 +306,34 @@
         });
 
         socket.on("giris_basarili", (data) => {
-            document.getElementById("login-ekrani").style.display = "none";
-            document.getElementById("admin-panel").style.display = "block";
+            document.getElementById("login-ekrani").classList.add("gizli");
+            document.getElementById("admin-panel").classList.remove("gizli");
 
             // Kayan yazıyı doldur
             document.getElementById("kayan_yazi_input").value = data.kayanYazi;
 
-            const listeDiv = document.getElementById("ayar-listesi");
-            listeDiv.innerHTML = "";
+            const listeTbody = document.getElementById("ayar-listesi-body");
+            listeTbody.innerHTML = "";
 
             data.ayarlar.forEach(urun => {
                 // TV'deki anlık fiyatı al (Eğer ilk saniye boşsa 0 kabul et)
                 let guncel = sonCanliFiyatlar[urun.isim] || { alis: 0, satis: 0 };
 
-                // İKİNCİ SİHİRBAZLIK: Matematiksel olarak sistemin Ham Fiyatını (Müdahalesiz Fiyatını) buluyoruz
-                // Ham Fiyat = Ekranda Yazan Final Fiyat - Bizim Eski Ayarımız
+                // İKİNCİ SİHİRBAZLIK: Matematiksel olarak sistemin Ham Fiyatını buluyoruz
                 let baseAlis = guncel.alis - urun.alisAyar;
                 let baseSatis = guncel.satis - urun.satisAyar;
 
-                listeDiv.innerHTML += `
-                    <div class="urun-ayar" data-kod="${urun.kod}" data-base-alis="${baseAlis}" data-base-satis="${baseSatis}">
-                        <span class="urun-isim">${urun.isim}</span>
-                        <div class="fiyat-girdileri">
-                            <div class="ayar-grubu">
-                                <label>Alış Fiyatı</label>
-                                <input type="number" step="50" id="alis_${urun.kod}" value="${guncel.alis}">
-                            </div>
-                            <div class="ayar-grubu">
-                                <label>Satış Fiyatı</label>
-                                <input type="number" step="50" id="satis_${urun.kod}" value="${guncel.satis}">
-                            </div>
-                        </div>
-                    </div>
+                // Ekrana Tablo Satırı (TR) Olarak Basıyoruz
+                listeTbody.innerHTML += `
+                    <tr class="urun-ayar" data-kod="${urun.kod}" data-base-alis="${baseAlis}" data-base-satis="${baseSatis}">
+                        <td class="isim-sutunu">${urun.isim}</td>
+                        <td>
+                            <input type="number" step="50" id="alis_${urun.kod}" value="${guncel.alis}">
+                        </td>
+                        <td>
+                            <input type="number" step="50" id="satis_${urun.kod}" value="${guncel.satis}">
+                        </td>
+                    </tr>
                 `;
             });
         });
@@ -275,7 +353,7 @@
                 let inputAlis = Number(document.getElementById("alis_" + kod).value);
                 let inputSatis = Number(document.getElementById("satis_" + kod).value);
 
-                // ÜÇÜNCÜ SİHİRBAZLIK: Sunucuya göndereceğimiz YENİ AYAR = Kutuya Yazılan Yeni Fiyat - Ham Fiyat
+                // ÜÇÜNCÜ SİHİRBAZLIK: Sunucuya göndereceğimiz YENİ AYAR
                 let yeniAlisAyar = inputAlis - baseAlis;
                 let yeniSatisAyar = inputSatis - baseSatis;
 
@@ -284,9 +362,10 @@
 
             const kayanYaziMetni = document.getElementById("kayan_yazi_input").value;
 
-            // Arka planda her şey aynı formata dönüştü, sunucunun ruhu bile duymayacak!
+            // Arka planda her şey aynı formata dönüştü
             socket.emit("ayarlari_guncelle", { fiyatlar: fiyatlar, kayanYazi: kayanYaziMetni });
 
+            // Başarı bildirimi göster
             const bildirimDiv = document.getElementById("bildirim");
             bildirimDiv.classList.add("goster");
             setTimeout(() => { bildirimDiv.classList.remove("goster"); }, 3000);
