@@ -4,6 +4,7 @@ const socketIo = require('socket.io');
 const ioClient = require('socket.io-client');
 const path = require('path');
 const fs = require('fs');
+const cron = require('node-cron');
 
 const app = express();
 app.use(express.static('public'));
@@ -146,13 +147,32 @@ function fiyatlariHesaplaVeYayinla(yeniAnaVeri) {
     io.emit("guncel_fiyatlar", tvVerisi);
 }
 
-// 2. ADIM: DIŞARIDAN VERİ ÇEKME
-const leventSocket = ioClient("https://www.leventkuyumculuk.com", { transports: ["polling", "websocket"] });
-console.log("⏳ Levent Kuyumculuk'a bağlanılıyor...");
+// --- 2. ADIM: DIŞARIDAN SADECE İHTİYAÇ ANINDA VERİ ÇEKME ---
 
-leventSocket.on("price_changed", (gelenVeri) => {
-    if (!gelenVeri || !gelenVeri.data) return;
-    fiyatlariHesaplaVeYayinla(gelenVeri.data);
+// Bu fonksiyon sadece çağrıldığında 1 saniyeliğine bağlanıp veriyi alır ve çıkar
+function piyasadanTekSeferlikVeriCek() {
+    console.log("📡 Piyasadan açılış verisi bekleniyor...");
+    const geciciSoket = ioClient("https://www.leventkuyumculuk.com", { transports: ["polling", "websocket"] });
+    
+    // "once" komutu veriyi sadece 1 KERE almasını ve ardından dinlemeyi bırakmasını sağlar
+    geciciSoket.once("price_changed", (gelenVeri) => {
+        if (gelenVeri && gelenVeri.data) {
+            fiyatlariHesaplaVeYayinla(gelenVeri.data);
+            console.log("✅ Sabah verisi başarıyla alındı. Dış bağlantı tamamen kapatılıyor!");
+        }
+        geciciSoket.disconnect(); // Veriyi alır almaz fişi çekiyoruz, gün boyu rahatız!
+    });
+}
+
+// A) Sunucu ilk çalıştığında (Coolify güncellendiğinde vs.) ekran boş kalmasın diye 1 kere çek:
+piyasadanTekSeferlikVeriCek();
+
+// B) MÜŞTERİNİN İSTEĞİ: Her sabah tam 09:00'da çalışacak sanal çalar saat:
+cron.schedule('0 9 * * *', () => {
+    console.log("⏰ Saat tam 09:00! Günlük piyasa açılış verisi çekiliyor...");
+    piyasadanTekSeferlikVeriCek();
+}, {
+    timezone: "Europe/Istanbul" // Türkiye saatine göre çalışması hayati önem taşır
 });
 
 // --- İÇ HABERLEŞME (TV ve Admin Paneli) ---
