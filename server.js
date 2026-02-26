@@ -19,7 +19,7 @@ const io = socketIo(server);
 
 // --- ADMİN ŞİFRESİ ---
 const ADMIN_SIFRE = "123";
-const AYARLAR_DOSYASI = path.join(__dirname, 'ayarlar.json'); // YENİ: Ayarların kaydedileceği dosyanın yolu
+const AYARLAR_DOSYASI = path.join(__dirname, 'data', 'settings.json'); // YENİ: Ayarların kaydedileceği dosyanın yolu
 
 let kayanYaziMetni = "Gediz Sarraflar Derneği - Güncel Altın Fiyatları Ekranına Hoş Geldiniz...";
 
@@ -153,7 +153,7 @@ function fiyatlariHesaplaVeYayinla(yeniAnaVeri) {
 function piyasadanTekSeferlikVeriCek() {
     console.log("📡 Piyasadan açılış verisi bekleniyor...");
     const geciciSoket = ioClient("https://www.leventkuyumculuk.com", { transports: ["polling", "websocket"] });
-    
+
     // "once" komutu veriyi sadece 1 KERE almasını ve ardından dinlemeyi bırakmasını sağlar
     geciciSoket.once("price_changed", (gelenVeri) => {
         if (gelenVeri && gelenVeri.data) {
