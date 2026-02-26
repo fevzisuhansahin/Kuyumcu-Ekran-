@@ -86,7 +86,7 @@
             font-weight: normal;
         }
 
-        /* --- YENİ EKLENEN CANLI SAAT TASARIMI --- */
+        /* --- CANLI SAAT TASARIMI --- */
         .zaman-paneli {
             position: absolute;
             left: 30px;
@@ -98,7 +98,6 @@
             padding: 8px 20px;
             border-radius: 8px;
             box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
-            /* İçeriye doğru hafif dijital ekran gölgesi */
             transition: 0.4s ease;
         }
 
@@ -113,9 +112,7 @@
 
         .saat-kismi .saniye {
             font-size: 0.55em;
-            /* Saniyeyi küçülttük */
             color: var(--renk-soluk);
-            /* Rengini soluklaştırdık */
             font-weight: 600;
         }
 
@@ -224,14 +221,6 @@
             display: block;
         }
 
-        .saat-metni {
-            font-size: 0.6em;
-            color: var(--renk-soluk);
-            font-weight: normal;
-            margin-top: 4px;
-            display: block;
-        }
-
         tr:last-child td {
             border-bottom: none;
         }
@@ -264,7 +253,7 @@
             animation: flash-red 1.5s ease-out;
         }
 
-        /* --- YENİ EKLENEN KAYAN YAZI TASARIMI --- */
+        /* --- KAYAN YAZI TASARIMI --- */
         .alt-bant {
             position: fixed;
             bottom: 0;
@@ -277,7 +266,6 @@
             font-weight: bold;
             box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.15);
             z-index: 1000;
-            /* YENİ: Arkada kalan tabloyu buzlu cam gibi gösterir */
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
         }
@@ -362,27 +350,19 @@
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        // --- YENİ CANLI SAAT VE TARİH KODU ---
         function saatiGuncelle() {
             const simdi = new Date();
-
-            // Saat ve Dakikayı al (Örn: 14:30)
             const saatDakika = simdi.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
-
-            // YENİ: Saniyeyi al, metne çevir ve 2 haneli değilse başına '0' ekle!
             const saniye = String(simdi.getSeconds()).padStart(2, '0');
-
-            // Tarihi al (Örn: 23 Şubat 2026 Pazartesi)
             const tarihSecenekleri = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             const tarihStr = simdi.toLocaleDateString('tr-TR', tarihSecenekleri);
 
-            // Ekrana bas
             document.getElementById('saat-metni').innerHTML = `${saatDakika}<span class="saniye">:${saniye}</span>`;
             document.getElementById('tarih-metni').innerText = tarihStr;
         }
 
-        setInterval(saatiGuncelle, 1000); // Her 1 saniyede bir saati güncelle
-        saatiGuncelle(); // Sayfa açılır açılmaz saati yaz
+        setInterval(saatiGuncelle, 1000);
+        saatiGuncelle();
 
         const temaButonu = document.getElementById("tema-butonu");
         if (localStorage.getItem("seciliTema") === "acik") {
@@ -405,7 +385,6 @@
 
         let oncekiFiyatlar = {};
 
-        // --- KAYAN YAZIYI GÜNCELLEME KODU ---
         socket.on("kayan_yazi_guncelle", (yeniYazi) => {
             document.getElementById("kayan-yazi-ekrani").innerText = yeniYazi;
         });
@@ -431,7 +410,8 @@
                         }
                         oncekiFiyatlar[urun.isim] = urun.yeniSatis;
 
-                        html += `<tr class="${yonSinifi}"><td class="isim-sutunu"><span class="isim-metni">${urun.isim}</span><span class="saat-metni">${urun.saat}</span></td><td>${formatla(urun.yeniAlis)}</td><td>${formatla(urun.yeniSatis)}</td><td>${formatla(urun.eskiAlis)}</td><td>${formatla(urun.eskiSatis)}</td></tr>`;
+                        // SAAT KISMI SİLİNDİ, YALNIZCA İSİM KALDI
+                        html += `<tr class="${yonSinifi}"><td class="isim-sutunu"><span class="isim-metni">${urun.isim}</span></td><td>${formatla(urun.yeniAlis)}</td><td>${formatla(urun.yeniSatis)}</td><td>${formatla(urun.eskiAlis)}</td><td>${formatla(urun.eskiSatis)}</td></tr>`;
                     });
                 } else {
                     html += `<tr><th class="sol">BİRİM</th><th>ALIŞ</th><th>SATIŞ</th></tr>`;
@@ -443,7 +423,8 @@
                         }
                         oncekiFiyatlar[urun.isim] = urun.satis;
 
-                        html += `<tr class="${yonSinifi}"><td class="isim-sutunu"><span class="isim-metni">${urun.isim}</span><span class="saat-metni">${urun.saat}</span></td><td>${formatla(urun.alis)}</td><td>${formatla(urun.satis)}</td></tr>`;
+                        // SAAT KISMI SİLİNDİ, YALNIZCA İSİM KALDI
+                        html += `<tr class="${yonSinifi}"><td class="isim-sutunu"><span class="isim-metni">${urun.isim}</span></td><td>${formatla(urun.alis)}</td><td>${formatla(urun.satis)}</td></tr>`;
                     });
                 }
                 html += `</table></div>`;
