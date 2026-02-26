@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Admin Paneli</title>
+    <title>Sistem Yönetim Paneli</title>
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
@@ -118,7 +118,7 @@
         }
 
         .ayar-grubu input {
-            width: 80px;
+            width: 90px;
             padding: 8px;
             text-align: center;
             font-weight: bold;
@@ -186,7 +186,7 @@
             <input type="text" id="kayan_yazi_input" placeholder="Ekranda alt bantta geçecek mesajı yazın...">
         </div>
 
-        <p class="alt-yazi" style="margin-bottom:10px;"><b>Fiyat Ayarları (+ / -)</b></p>
+        <p class="alt-yazi" style="margin-bottom:10px;"><b>Canlı Fiyat Ayarları (TV'deki Güncel Rakamlar)</b></p>
 
         <div id="ayar-listesi"></div>
 
@@ -198,6 +198,20 @@
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
+        let sonCanliFiyatlar = {}; // TV'de dönen anlık fiyatları burada tutacağız
+
+        // 1. SİHİRBAZLIK: Arka planda TV'ye giden verileri gizlice dinleyip cebimize koyuyoruz
+        socket.on("guncel_fiyatlar", (tvVerisi) => {
+            if (tvVerisi["Ziynet & Sarrafiye"]) {
+                tvVerisi["Ziynet & Sarrafiye"].forEach(item => sonCanliFiyatlar[item.isim] = { alis: item.yeniAlis, satis: item.yeniSatis });
+            }
+            if (tvVerisi["Gram Altın"]) {
+                tvVerisi["Gram Altın"].forEach(item => sonCanliFiyatlar[item.isim] = { alis: item.alis, satis: item.satis });
+            }
+            if (tvVerisi["Piyasalar"]) {
+                tvVerisi["Piyasalar"].forEach(item => sonCanliFiyatlar[item.isim] = { alis: item.alis, satis: item.satis });
+            }
+        });
 
         function girisYap() {
             const sifre = document.getElementById("sifre").value;
@@ -220,17 +234,25 @@
             listeDiv.innerHTML = "";
 
             data.ayarlar.forEach(urun => {
+                // TV'deki anlık fiyatı al (Eğer ilk saniye boşsa 0 kabul et)
+                let guncel = sonCanliFiyatlar[urun.isim] || { alis: 0, satis: 0 };
+
+                // İKİNCİ SİHİRBAZLIK: Matematiksel olarak sistemin Ham Fiyatını (Müdahalesiz Fiyatını) buluyoruz
+                // Ham Fiyat = Ekranda Yazan Final Fiyat - Bizim Eski Ayarımız
+                let baseAlis = guncel.alis - urun.alisAyar;
+                let baseSatis = guncel.satis - urun.satisAyar;
+
                 listeDiv.innerHTML += `
-                    <div class="urun-ayar">
+                    <div class="urun-ayar" data-kod="${urun.kod}" data-base-alis="${baseAlis}" data-base-satis="${baseSatis}">
                         <span class="urun-isim">${urun.isim}</span>
                         <div class="fiyat-girdileri">
                             <div class="ayar-grubu">
-                                <label>Alışa Ekle</label>
-                                <input type="number" id="alis_${urun.kod}" value="${urun.alisAyar}">
+                                <label>Alış Fiyatı</label>
+                                <input type="number" step="50" id="alis_${urun.kod}" value="${guncel.alis}">
                             </div>
                             <div class="ayar-grubu">
-                                <label>Satışa Ekle</label>
-                                <input type="number" id="satis_${urun.kod}" value="${urun.satisAyar}">
+                                <label>Satış Fiyatı</label>
+                                <input type="number" step="50" id="satis_${urun.kod}" value="${guncel.satis}">
                             </div>
                         </div>
                     </div>
@@ -239,18 +261,30 @@
         });
 
         function kaydet() {
-            const alisInputlari = document.querySelectorAll('input[id^="alis_"]');
             let fiyatlar = {};
+            const satirlar = document.querySelectorAll(".urun-ayar");
 
-            alisInputlari.forEach(input => {
-                let urunKodu = input.id.replace("alis_", "");
-                let satisInput = document.getElementById("satis_" + urunKodu);
-                fiyatlar[urunKodu] = { alisAyar: Number(input.value), satisAyar: Number(satisInput.value) };
+            satirlar.forEach(satir => {
+                let kod = satir.getAttribute("data-kod");
+
+                // Sakladığımız ham fiyatları geri çağırıyoruz
+                let baseAlis = Number(satir.getAttribute("data-base-alis"));
+                let baseSatis = Number(satir.getAttribute("data-base-satis"));
+
+                // Müşterinin kutuya yazdığı yeni final fiyatı alıyoruz
+                let inputAlis = Number(document.getElementById("alis_" + kod).value);
+                let inputSatis = Number(document.getElementById("satis_" + kod).value);
+
+                // ÜÇÜNCÜ SİHİRBAZLIK: Sunucuya göndereceğimiz YENİ AYAR = Kutuya Yazılan Yeni Fiyat - Ham Fiyat
+                let yeniAlisAyar = inputAlis - baseAlis;
+                let yeniSatisAyar = inputSatis - baseSatis;
+
+                fiyatlar[kod] = { alisAyar: yeniAlisAyar, satisAyar: yeniSatisAyar };
             });
 
             const kayanYaziMetni = document.getElementById("kayan_yazi_input").value;
 
-            // Fiyatları ve Kayan yazıyı paketleyip gönderiyoruz
+            // Arka planda her şey aynı formata dönüştü, sunucunun ruhu bile duymayacak!
             socket.emit("ayarlari_guncelle", { fiyatlar: fiyatlar, kayanYazi: kayanYaziMetni });
 
             const bildirimDiv = document.getElementById("bildirim");
