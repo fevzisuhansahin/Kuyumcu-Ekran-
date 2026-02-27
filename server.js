@@ -21,7 +21,7 @@ const io = socketIo(server);
 const ADMIN_SIFRE = "123";
 const AYARLAR_DOSYASI = path.join(__dirname, 'data', 'settings.json'); // YENİ: Ayarların kaydedileceği dosyanın yolu
 
-let kayanYaziMetni = "Gediz Sarraflar Derneği - Güncel Altın Fiyatları Ekranına Hoş Geldiniz...";
+let kayanYaziMetni = "";
 
 // --- VARSAYILAN AYARLAR ---
 // Artık sadece Has Altın (ALTIN) fiyatını alıp bu standart katsayılarla çarpıyoruz.
@@ -82,35 +82,22 @@ const saatAyirla = (tarihMetni) => {
     return tarihMetni.split(" ")[1] || tarihMetni;
 };
 
-// --- HESAPLAMA MOTORU ---
-function fiyatlariHesaplaVeYayinla(yeniAnaVeri) {
-    // İŞTE SİHİRLİ SATIR BURASI: 
-    // Gelen yeni verileri, eski hafızamızın (sonGelenHamVeri) üzerine yazıyoruz.
-    // Böylece o an pakette Gümüş olmasa bile, hafızada bir önceki saniyenin Gümüş fiyatı kalıyor!
-    sonGelenHamVeri = { ...sonGelenHamVeri, ...yeniAnaVeri };
-
-    // Artık eksik paketlerle değil, her zaman 8 ürünün de bulunduğu tam hafızayla çalışıyoruz
-    let anaVeri = sonGelenHamVeri;
-
-    let tvVerisi = {
-        "Ziynet & Sarrafiye": [],
-        "Gram Altın": [],
-        "Piyasalar": []
-    };
+// SADECE HESAPLAMA YAPAN SAF FONKSİYON
+function fiyatlariHesapla(anaVeri) {
+    let tvVerisi = { "Ziynet & Sarrafiye": [], "Gram Altın": [], "Piyasalar": [] };
 
     // Güvenlik: Eğer sistemde Has Altın (ALTIN) verisi yoksa hesaplama yapamayız
-    if (!anaVeri["ALTIN"]) return;
+    if (!anaVeri || !anaVeri["ALTIN"]) return tvVerisi;
 
     // Tüm ziynetleri hesaplamak için baz alacağımız saf ALTIN fiyatı
     let hasAltinAlis = anaVeri["ALTIN"].alis;
     let hasAltinSatis = anaVeri["ALTIN"].satis;
     let altinSaat = saatAyirla(anaVeri["ALTIN"].tarih);
 
-    // 1. ZİYNET (Matematiksel Çarpanlarla Sıfırdan Hesaplama)
+    // 1. ZİYNET
     ziynetUrunleri.forEach(ayar => {
         tvVerisi["Ziynet & Sarrafiye"].push({
-            isim: ayar.isim,
-            saat: altinSaat,
+            isim: ayar.isim, saat: altinSaat,
             // Alışları aşağı (floor) yuvarla, Satışlara kar ekle ve yukarı (ceil) yuvarla
             yeniAlis: Math.floor((hasAltinAlis * ayar.yeniAlis) / 50) * 50 + ayar.alisAyar,
             yeniSatis: Math.ceil((hasAltinSatis * ayar.yeniSatis) / 50) * 50 + ayar.satisAyar,
@@ -123,8 +110,7 @@ function fiyatlariHesaplaVeYayinla(yeniAnaVeri) {
     gramUrunleri.forEach(ayar => {
         if (anaVeri[ayar.kod]) {
             tvVerisi["Gram Altın"].push({
-                isim: ayar.isim,
-                saat: saatAyirla(anaVeri[ayar.kod].tarih),
+                isim: ayar.isim, saat: saatAyirla(anaVeri[ayar.kod].tarih),
                 alis: Math.floor((anaVeri[ayar.kod].alis) / 50) * 50 + ayar.alisAyar,
                 satis: Math.ceil((anaVeri[ayar.kod].satis) / 50) * 50 + ayar.satisAyar
             });
@@ -135,51 +121,59 @@ function fiyatlariHesaplaVeYayinla(yeniAnaVeri) {
     piyasaUrunleri.forEach(ayar => {
         if (anaVeri[ayar.kod]) {
             tvVerisi["Piyasalar"].push({
-                isim: ayar.isim,
-                saat: saatAyirla(anaVeri[ayar.kod].tarih),
+                isim: ayar.isim, saat: saatAyirla(anaVeri[ayar.kod].tarih),
                 alis: Math.floor((anaVeri[ayar.kod].alis) / 50) * 50 + ayar.alisAyar,
                 satis: Math.ceil((anaVeri[ayar.kod].satis) / 50) * 50 + ayar.satisAyar
             });
         }
     });
 
-    sonHesaplananFiyatlar = tvVerisi;
-    io.emit("guncel_fiyatlar", tvVerisi);
+    return tvVerisi;
+}
+
+// ONAYLANAN VERİYİ TV'YE FIRLATMA KOMUTU
+function tvyeYayinla() {
+    if (!guncelHamVeri) return;
+    sonHesaplananFiyatlar = fiyatlariHesapla(guncelHamVeri);
+    io.emit("guncel_fiyatlar", sonHesaplananFiyatlar);
+    console.log("📺 YENİ FİYATLAR TV EKRANINA YANSITILDI!");
 }
 
 // --- 2. ADIM: DIŞARIDAN SADECE İHTİYAÇ ANINDA VERİ ÇEKME ---
-
-// Bu fonksiyon sadece çağrıldığında 1 saniyeliğine bağlanıp veriyi alır ve çıkar
-function piyasadanTekSeferlikVeriCek() {
+function piyasadanTekSeferlikVeriCek(otomatikYayinla = false) {
     console.log("📡 Piyasadan açılış verisi bekleniyor...");
     const geciciSoket = ioClient("https://www.leventkuyumculuk.com", { transports: ["polling", "websocket"] });
 
-    // "once" komutu veriyi sadece 1 KERE almasını ve ardından dinlemeyi bırakmasını sağlar
     geciciSoket.once("price_changed", (gelenVeri) => {
         if (gelenVeri && gelenVeri.data) {
-            fiyatlariHesaplaVeYayinla(gelenVeri.data);
-            console.log("✅ Sabah verisi başarıyla alındı. Dış bağlantı tamamen kapatılıyor!");
+            // Veriyi daima bekleme odasına (havuza) atıyoruz
+            guncelHamVeri = { ...guncelHamVeri, ...gelenVeri.data };
+
+            if (otomatikYayinla) {
+                tvyeYayinla(); // Sunucu ilk açıldığında TV boş kalmasın diye yayınlar
+            } else {
+                console.log("✅ Sabah 09:00 verisi BEKLEME ODASINA alındı. Admin onayı bekleniyor...");
+            }
         }
-        geciciSoket.disconnect(); // Veriyi alır almaz fişi çekiyoruz, gün boyu rahatız!
+        geciciSoket.disconnect();
     });
 }
 
-// A) Sunucu ilk çalıştığında (Coolify güncellendiğinde vs.) ekran boş kalmasın diye 1 kere çek:
-piyasadanTekSeferlikVeriCek();
+// A) Sunucu ilk çalıştığında 1 kere çek ve TV'ye yayınla
+piyasadanTekSeferlikVeriCek(true);
 
-// B) MÜŞTERİNİN İSTEĞİ: Her sabah tam 09:00'da çalışacak sanal çalar saat:
+// B) Her sabah 09:00'da çek ama ASLA YAYINLAMA (Sadece Bekleme Odasına al)
 cron.schedule('0 9 * * *', () => {
-    console.log("⏰ Saat tam 09:00! Günlük piyasa açılış verisi çekiliyor...");
-    piyasadanTekSeferlikVeriCek();
-}, {
-    timezone: "Europe/Istanbul" // Türkiye saatine göre çalışması hayati önem taşır
-});
+    console.log("⏰ Saat tam 09:00! Piyasa verisi çekiliyor...");
+    piyasadanTekSeferlikVeriCek(false);
+}, { timezone: "Europe/Istanbul" });
 
 // --- İÇ HABERLEŞME (TV ve Admin Paneli) ---
 io.on("connection", (soket) => {
     // TV ilk bağlandığında kayan yazıyı da gönder
     soket.emit("kayan_yazi_guncelle", kayanYaziMetni);
 
+    // Yeni bağlanan TV'ye BEKLEME ODASINI değil, ONAYLANMIŞ eski fiyatı göster
     if (sonHesaplananFiyatlar !== null) {
         soket.emit("guncel_fiyatlar", sonHesaplananFiyatlar);
     }
@@ -193,7 +187,11 @@ io.on("connection", (soket) => {
                 alisAyar: urun.alisAyar, // Alış ayarını HTML'e yolla
                 satisAyar: urun.satisAyar // Satış ayarını HTML'e yolla
             }));
-            soket.emit("giris_basarili", { ayarlar: tumAyarlar, kayanYazi: kayanYaziMetni });
+
+            // SİHİRLİ DOKUNUŞ: Admine TV'yi değil, bekleme odasındaki "Taslak" veriyi yolluyoruz
+            let taslakFiyatlar = guncelHamVeri ? fiyatlariHesapla(guncelHamVeri) : sonHesaplananFiyatlar;
+
+            soket.emit("giris_basarili", { ayarlar: tumAyarlar, kayanYazi: kayanYaziMetni, taslak: taslakFiyatlar });
         } else {
             console.log("❌ Hatalı admin girişi denemesi.");
             soket.emit("giris_hatali");
@@ -225,13 +223,10 @@ io.on("connection", (soket) => {
         // 2. YENİ: Ayarları fiziksel dosyaya (JSON) kalıcı olarak kaydet
         fs.writeFile(AYARLAR_DOSYASI, JSON.stringify(kaydedilecekData, null, 2), (err) => {
             if (err) console.log("❌ Ayarlar dosyaya kaydedilirken hata oluştu!", err);
-            else console.log("📝 Yeni ayarlar ayarlar.json dosyasına yazıldı.");
         });
 
-        // 3. Fiyatları yeni ayarlarla hesapla ve TV'ye gönder
-        if (sonGelenHamVeri !== null) {
-            fiyatlariHesaplaVeYayinla(sonGelenHamVeri);
-        }
+        // Admin onayladığı için bekleme odasındaki veriyi yeni ayarlarla TV'ye yansıtıyoruz!
+        tvyeYayinla();
     });
 });
 
