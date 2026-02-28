@@ -74,8 +74,9 @@ function ayarlariYukle() {
 // Sistem başlarken eski ayarları hemen yükle
 ayarlariYukle();
 
-let sonHesaplananFiyatlar = null;
-let sonGelenHamVeri = {};
+// YENİ MİMARİ DEĞİŞKENLERİ
+let sonHesaplananFiyatlar = null; // Sadece TV'nin gördüğü (Onaylanmış)
+let guncelHamVeri = null; // Sadece Admin'in gördüğü (Bekleme Odası)
 
 const saatAyirla = (tarihMetni) => {
     if (!tarihMetni) return "";
