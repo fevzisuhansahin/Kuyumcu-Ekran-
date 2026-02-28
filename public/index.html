@@ -39,7 +39,7 @@
         body {
             background-color: var(--bg-body);
             color: var(--renk-metin);
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             margin: 0;
             padding: 20px 60px;
             /* Alt bandın kapanmaması için ekstra padding */
@@ -203,9 +203,11 @@
 
         .isim-metni {
             color: var(--renk-metin);
-            font-size: 1em;
-            font-weight: bold;
+            font-size: 1.1em;
+            font-weight: 800 !important;
             display: block;
+            letter-spacing: 0.5px;
+            /* Mobilde harflerin birbirine girmesini önler */
         }
 
         tr:last-child td {
