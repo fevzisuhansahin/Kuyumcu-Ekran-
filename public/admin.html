@@ -5,8 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Yönetim Paneli</title>
+    <link rel="icon" href="/logo.png" type="image/png">
     <style>
-        /* TV Ekranındaki Tema Değişkenleri Birebir Aynı */
+        /* CSS KODLARI TAMAMEN AYNI KALDI */
         :root {
             --bg-body: #121212;
             --bg-kutu: #1e1e1e;
@@ -42,7 +43,7 @@
         body {
             background-color: var(--bg-body);
             color: var(--renk-metin);
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             margin: 0;
             padding: 20px 60px;
             min-height: 100vh;
@@ -52,7 +53,6 @@
             transition: background-color 0.4s ease, color 0.4s ease;
         }
 
-        /* --- ÜST BİLGİ VE SAAT TASARIMI (Birebir Aynı) --- */
         .ust-bilgi {
             display: flex;
             align-items: center;
@@ -138,7 +138,6 @@
             transition: 0.3s;
         }
 
-        /* --- IZGARA (GRID) YAPISI --- */
         #ekran-icerik {
             display: grid;
             grid-template-columns: 1.6fr 1fr;
@@ -146,7 +145,6 @@
             gap: 25px;
             align-items: stretch;
             display: none;
-            /* Giriş yapana kadar gizli */
         }
 
         .grup-karti {
@@ -183,7 +181,6 @@
             grid-column: 1 / 3;
             grid-row: 4 / 5;
             padding: 0;
-            /* Buton kartında padding istemiyoruz */
             background: transparent;
             border: none;
             box-shadow: none;
@@ -199,7 +196,6 @@
             font-weight: normal;
         }
 
-        /* --- TABLO TASARIMI --- */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -229,15 +225,16 @@
         td.isim-sutunu {
             text-align: left;
             font-size: 1.1em;
-            font-weight: bold;
+            font-weight: 500 !important;
             color: var(--renk-metin);
+            letter-spacing: 0.5px;
+            /* Mobilde harflerin birbirine girmesini önler */
         }
 
         tr:last-child td {
             border-bottom: none;
         }
 
-        /* --- İNPUT (GİRDİ) TASARIMLARI --- */
         input.fiyat-input {
             background-color: transparent;
             border: 1px solid var(--renk-cizgi);
@@ -275,7 +272,6 @@
             border-color: var(--renk-baslik);
         }
 
-        /* --- BUTON VE BİLDİRİM --- */
         .kaydet-btn {
             background-color: #28a745;
             color: white;
@@ -321,7 +317,6 @@
             transform: translateY(0);
         }
 
-        /* --- GİRİŞ EKRANI KARTI --- */
         #login-ekrani {
             max-width: 400px;
             margin: 50px auto;
@@ -353,7 +348,6 @@
             cursor: pointer;
         }
 
-        /* --- MOBİL VE KÜÇÜK EKRAN UYUMU (İÇ İÇE GİRMEYİ ÖNLER) --- */
         @media (max-width: 1100px) {
             body {
                 padding: 15px 15px 70px 15px;
@@ -366,7 +360,6 @@
                 text-align: center;
             }
 
-            /* Saat ve Tema butonunun çivilerini söküyoruz, alt alta dizilmelerini sağlıyoruz */
             .zaman-paneli,
             #tema-butonu {
                 position: static;
@@ -379,18 +372,15 @@
                 font-size: 1.6em;
             }
 
-            /* Izgara (Grid) yapısını tek sütuna düşürür */
             #ekran-icerik {
                 grid-template-columns: 1fr;
             }
 
-            /* Tüm kartları tam ekran genişliğine yayar */
             .grup-karti,
             .karti-tam-genislik {
                 grid-column: 1 / -1 !important;
                 grid-row: auto !important;
                 overflow-x: auto;
-                /* Tablo taşarsa sağa kaydırma çubuğu çıkarır */
                 padding: 15px;
             }
 
@@ -402,24 +392,38 @@
             th {
                 font-size: 0.8em;
             }
+        }
 
-            .alt-bant {
-                font-size: 1.1em;
-            }
+        /* --- GERÇEK LOGO TASARIMI --- */
+        .uygulama-logosu {
+            height: 110px;
+            /* Header yüksekliğine göre ayarlandı, gerekirse müşteriye göre değiştiririz */
+            width: auto;
+            /* En-boy oranını korumasını sağlar */
+            border-radius: 8px;
+            /* Eğer logo dikdörtgense hafif yuvarlak kenar şık durur */
+            object-fit: contain;
+            /* Resmin kutuya sığmasını sağlar */
+            border: none;
+            padding: 3px;
+            /* Çizgi ile resim arasında ufak bir nefes payı */
+            transition: 0.4s ease;
+            /* Tema değişirken logo çizgisi de yumuşak değişir */
         }
     </style>
 </head>
 
 <body>
 
-    <div id="bildirim">✅ Ayarlar Ekrana Gönderildi!</div>
+    <div id="bildirim">✅ Ayarlar Başarıyla Yayınlandı!</div>
 
     <div class="ust-bilgi">
         <div class="zaman-paneli">
             <div class="saat-kismi" id="saat-metni">--:--<span class="saniye">:--</span></div>
             <div class="tarih-kismi" id="tarih-metni">Yükleniyor...</div>
         </div>
-        <div class="logo-placeholder">PANEL</div>
+        <img src="/logo.png" alt="Dernek Logosu" class="uygulama-logosu">
+
         <h1 class="baslik">Gediz Sarraflar Derneği - Yönetim</h1>
         <button id="tema-butonu">☀️ Açık Tema</button>
     </div>
@@ -433,9 +437,8 @@
     </div>
 
     <div id="ekran-icerik">
-
         <div class="grup-karti karti-tam-genislik">
-            <h2 class="grup-baslik">📢 Ekran Altı Kayan Yazı</h2>
+            <h2 class="grup-baslik">Ekran Altı Kayan Yazı</h2>
             <input type="text" id="kayan_yazi_input" class="yazi-input"
                 placeholder="Ekranda alt bantta geçecek mesajı yazın...">
         </div>
@@ -483,14 +486,12 @@
         </div>
 
         <div class="grup-karti karti-buton" data-grup="Kaydet">
-            <button class="kaydet-btn" onclick="kaydet()">Tüm Değişiklikleri Ekrana Yansıt</button>
+            <button class="kaydet-btn" onclick="kaydet()">Onayla ve Yansıt</button>
         </div>
-
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        // --- SAAT VE TEMA MANTIĞI (TV EKRANI İLE BİREBİR AYNI) ---
         function saatiGuncelle() {
             const simdi = new Date();
             const saatDakika = simdi.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
@@ -518,16 +519,8 @@
             }
         });
 
-        // --- SOKET VE VERİ YÖNETİMİ ---
         const socket = io();
         let sonCanliFiyatlar = {};
-
-        // Arka planda TV'ye giden verileri gizlice dinliyoruz
-        socket.on("guncel_fiyatlar", (tvVerisi) => {
-            if (tvVerisi["Ziynet & Sarrafiye"]) tvVerisi["Ziynet & Sarrafiye"].forEach(item => sonCanliFiyatlar[item.isim] = { alis: item.yeniAlis, satis: item.yeniSatis });
-            if (tvVerisi["Gram Altın"]) tvVerisi["Gram Altın"].forEach(item => sonCanliFiyatlar[item.isim] = { alis: item.alis, satis: item.satis });
-            if (tvVerisi["Piyasalar"]) tvVerisi["Piyasalar"].forEach(item => sonCanliFiyatlar[item.isim] = { alis: item.alis, satis: item.satis });
-        });
 
         function girisYap() {
             const sifre = document.getElementById("sifre").value;
@@ -541,18 +534,24 @@
 
         socket.on("giris_basarili", (data) => {
             document.getElementById("login-ekrani").style.display = "none";
-            document.getElementById("ekran-icerik").style.display = "grid"; // Izgarayı aç
+            document.getElementById("ekran-icerik").style.display = "grid";
 
             document.getElementById("kayan_yazi_input").value = data.kayanYazi;
 
-            // Hangi ürünün hangi tabloya ait olduğunu belirleyen sözlük
+            // YENİ MANTIK: TV'den değil, sunucudan gizlice gelen "Taslak" fiyata bakıyoruz
+            let tvVerisi = data.taslak;
+            if (tvVerisi) {
+                if (tvVerisi["Ziynet & Sarrafiye"]) tvVerisi["Ziynet & Sarrafiye"].forEach(item => sonCanliFiyatlar[item.isim] = { alis: item.yeniAlis, satis: item.yeniSatis });
+                if (tvVerisi["Gram Altın"]) tvVerisi["Gram Altın"].forEach(item => sonCanliFiyatlar[item.isim] = { alis: item.alis, satis: item.satis });
+                if (tvVerisi["Piyasalar"]) tvVerisi["Piyasalar"].forEach(item => sonCanliFiyatlar[item.isim] = { alis: item.alis, satis: item.satis });
+            }
+
             const gruplar = {
                 "CEYREK": "ziynet", "YARIM": "ziynet", "TAM": "ziynet", "GREMSE": "ziynet", "ATA": "ziynet",
                 "ALTIN": "piyasa", "GUMUSTRY": "piyasa",
                 "KULCEALTIN": "gram"
             };
 
-            // Tabloları temizle
             document.getElementById("tbody-ziynet").innerHTML = "";
             document.getElementById("tbody-piyasa").innerHTML = "";
             document.getElementById("tbody-gram").innerHTML = "";
