@@ -390,6 +390,23 @@
                 font-size: 0.8em;
             }
         }
+
+        /* --- GERÇEK LOGO TASARIMI --- */
+        .uygulama-logosu {
+            height: 70px;
+            /* Header yüksekliğine göre ayarlandı, gerekirse müşteriye göre değiştiririz */
+            width: auto;
+            /* En-boy oranını korumasını sağlar */
+            border-radius: 8px;
+            /* Eğer logo dikdörtgense hafif yuvarlak kenar şık durur */
+            object-fit: contain;
+            /* Resmin kutuya sığmasını sağlar */
+            border: none;
+            padding: 3px;
+            /* Çizgi ile resim arasında ufak bir nefes payı */
+            transition: 0.4s ease;
+            /* Tema değişirken logo çizgisi de yumuşak değişir */
+        }
     </style>
 </head>
 
@@ -402,7 +419,8 @@
             <div class="saat-kismi" id="saat-metni">--:--<span class="saniye">:--</span></div>
             <div class="tarih-kismi" id="tarih-metni">Yükleniyor...</div>
         </div>
-        <div class="logo-placeholder">PANEL</div>
+        <img src="/logo.png" alt="Dernek Logosu" class="uygulama-logosu">
+
         <h1 class="baslik">Gediz Sarraflar Derneği - Yönetim</h1>
         <button id="tema-butonu">☀️ Açık Tema</button>
     </div>
