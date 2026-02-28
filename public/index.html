@@ -65,19 +65,6 @@
             box-shadow: 0 4px 15px var(--kutu-golge);
         }
 
-        .logo-placeholder {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #d4af37, #f3e5ab);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: #fff;
-            border: 2px solid var(--logo-border);
-        }
-
         .baslik {
             color: var(--renk-baslik);
             font-family: 'Georgia', serif;
@@ -324,6 +311,24 @@
                 font-size: 1.1em;
             }
         }
+
+        /* --- GERÇEK LOGO TASARIMI --- */
+        .uygulama-logosu {
+            height: 70px;
+            /* Header yüksekliğine göre ayarlandı, gerekirse müşteriye göre değiştiririz */
+            width: auto;
+            /* En-boy oranını korumasını sağlar */
+            border-radius: 8px;
+            /* Eğer logo dikdörtgense hafif yuvarlak kenar şık durur */
+            object-fit: contain;
+            /* Resmin kutuya sığmasını sağlar */
+            border: 2px solid var(--logo-border);
+            /* TV ekranındaki o altın çizgiyi logoya da uygular */
+            padding: 3px;
+            /* Çizgi ile resim arasında ufak bir nefes payı */
+            transition: 0.4s ease;
+            /* Tema değişirken logo çizgisi de yumuşak değişir */
+        }
     </style>
 </head>
 
@@ -335,7 +340,8 @@
             <div class="tarih-kismi" id="tarih-metni">Yükleniyor...</div>
         </div>
 
-        <div class="logo-placeholder">LOGO</div>
+        <img src="/logo.png" alt="Dernek Logosu" class="uygulama-logosu">
+
         <h1 class="baslik">Gediz Sarraflar Derneği</h1>
         <button id="tema-butonu">☀️ Açık Tema</button>
     </div>
