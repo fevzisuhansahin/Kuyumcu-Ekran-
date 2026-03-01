@@ -15,19 +15,31 @@ setInterval(saatiGuncelle, 1000);
 saatiGuncelle();
 
 const temaButonu = document.getElementById("tema-butonu");
+
+// 1. Sayfa açılışında hafızadan KESİN yükleme
 if (localStorage.getItem("seciliTema") === "acik") {
     document.body.classList.add("acik-tema");
     temaButonu.innerText = "🌙 Koyu Tema";
+} else {
+    document.body.classList.remove("acik-tema");
+    temaButonu.innerText = "☀️ Açık Tema";
 }
 
-temaButonu.addEventListener("click", () => {
-    document.body.classList.toggle("acik-tema");
+// 2. Tıklama olayını "Zırhlı" hale getiriyoruz
+temaButonu.addEventListener("click", (olay) => {
+    olay.preventDefault(); // Hızlı tıklamalarda tarayıcının saçmalamasını engeller
+
+    // Toggle yerine KESİN (Explicit) geçiş mantığı
     if (document.body.classList.contains("acik-tema")) {
-        temaButonu.innerText = "🌙 Koyu Tema";
-        localStorage.setItem("seciliTema", "acik");
-    } else {
+        // Açıksa -> Kesinlikle Koyuya geç
+        document.body.classList.remove("acik-tema");
         temaButonu.innerText = "☀️ Açık Tema";
         localStorage.setItem("seciliTema", "koyu");
+    } else {
+        // Koyuyysa -> Kesinlikle Açığa geç
+        document.body.classList.add("acik-tema");
+        temaButonu.innerText = "🌙 Koyu Tema";
+        localStorage.setItem("seciliTema", "acik");
     }
 });
 

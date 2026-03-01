@@ -116,6 +116,12 @@ body {
     cursor: pointer;
     font-weight: bold;
     transition: 0.3s;
+
+    /* YENİ EKLENEN KORUMA KODLARI */
+    user-select: none;
+    /* Yazının yanlışlıkla seçilmesini (kopyalanmasını) engeller */
+    -webkit-tap-highlight-color: transparent;
+    /* Mobilde basınca çıkan mavi gölgeyi yok eder */
 }
 
 #ekran-icerik {
