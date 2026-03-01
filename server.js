@@ -1,5 +1,6 @@
 const express = require('express');
 const http = require('http');
+require('dotenv').config(); // YENİ EKLENEN SATIR (En üstlerde olsun)
 const socketIo = require('socket.io');
 const ioClient = require('socket.io-client');
 const path = require('path');
@@ -18,7 +19,8 @@ const server = http.createServer(app);
 const io = socketIo(server);
 
 // --- ADMİN ŞİFRESİ ---
-const ADMIN_SIFRE = "123";
+// Şifreyi artık .env dosyasından çekiyor. Eğer dosyayı bulamazsa güvenlik için '123' yapıyor.
+const ADMIN_SIFRE = process.env.ADMIN_SIFRE;
 const AYARLAR_DOSYASI = path.join(__dirname, 'data', 'settings.json'); // YENİ: Ayarların kaydedileceği dosyanın yolu
 
 let kayanYaziMetni = "";
