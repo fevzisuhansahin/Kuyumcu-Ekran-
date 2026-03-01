@@ -35,7 +35,8 @@ let ziynetUrunleri = [
 ];
 
 let gramUrunleri = [
-    { isim: "1 GR", kod: "KULCEALTIN", alisAyar: 0, satisAyar: 0 }
+    { isim: "1 GR", kod: "KULCEALTIN", alisAyar: 0, satisAyar: 0 },
+    { isim: "BİLEZİK", kod: "BILEZIK", alisAyar: 0, satisAyar: 0, manuel: true } // YENİ EKLENDİ
 ];
 
 let piyasaUrunleri = [
@@ -114,7 +115,15 @@ function fiyatlariHesapla(anaVeri) {
 
     // 2. GRAM
     gramUrunleri.forEach(ayar => {
-        if (anaVeri[ayar.kod]) {
+        if (ayar.manuel) {
+            // YENİ: Manuel ürünler (Bilezik) internetten veri beklemez!
+            tvVerisi["Gram Altın"].push({
+                isim: ayar.isim, saat: altinSaat,
+                alis: ayar.alisAyar, // Taban fiyat 0 olduğu için senin girdiğin ayar direkt fiyattır
+                satis: ayar.satisAyar
+            });
+        } else if (anaVeri[ayar.kod]) {
+            // Otomatik ürünler internetten hesaplanır
             tvVerisi["Gram Altın"].push({
                 isim: ayar.isim, saat: saatAyirla(anaVeri[ayar.kod].tarih),
                 alis: Math.floor((anaVeri[ayar.kod].alis) / 50) * 50 + ayar.alisAyar,
@@ -191,7 +200,10 @@ io.on("connection", (soket) => {
                 isim: urun.isim,
                 kod: urun.kod,
                 alisAyar: urun.alisAyar, // Alış ayarını HTML'e yolla
-                satisAyar: urun.satisAyar // Satış ayarını HTML'e yolla
+                satisAyar: urun.satisAyar, // Satış ayarını HTML'e yolla
+                // YENİ EKLENDİ: Admin panele girdiğinde eski tarihli ayarları da ona gönderiyoruz
+                eskiAlisAyar: urun.eskiAlisAyar || 0,
+                eskiSatisAyar: urun.eskiSatisAyar || 0
             }));
 
             // SİHİRLİ DOKUNUŞ: Admine TV'yi değil, bekleme odasındaki "Taslak" veriyi yolluyoruz
@@ -220,6 +232,11 @@ io.on("connection", (soket) => {
             if (yeniMiktarlar[u.kod]) {
                 u.alisAyar = yeniMiktarlar[u.kod].alisAyar;
                 u.satisAyar = yeniMiktarlar[u.kod].satisAyar;
+                // YENİ EKLENDİ: Eğer admin panelinden eski tarihli ayarlar da geldiyse onları da hafızaya yaz
+                if (yeniMiktarlar[u.kod].eskiAlisAyar !== undefined) {
+                    u.eskiAlisAyar = yeniMiktarlar[u.kod].eskiAlisAyar;
+                    u.eskiSatisAyar = yeniMiktarlar[u.kod].eskiSatisAyar;
+                }
             }
         });
 
