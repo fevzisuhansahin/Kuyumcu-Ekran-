@@ -17,7 +17,7 @@ const socketYoneticisi = require('./src/sockets/socketManager');
 const app = express();
 app.use(express.static('public'));
 
-app.get('/admin', (req, res) => {
+app.get('/gediz_sistem_yönetim_0103', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 

@@ -28,6 +28,7 @@
     --kutu-golge: rgba(0, 0, 0, 0.05);
     --bant-bg: rgba(15, 46, 90, 0.85);
     --bant-text: #ffffff;
+    --login-btn-text: #ffffff;
 }
 
 body {
