@@ -361,28 +361,31 @@
             cursor: pointer;
         }
 
+        /* --- MOBİL VE KÜÇÜK EKRAN UYUMU --- */
         @media (max-width: 1100px) {
             body {
-                /* Güncellendi */
                 padding: 0 0 70px 0;
             }
 
             .ust-bilgi {
-                /* Güncellendi */
+                flex-direction: column;
                 padding: 20px 15px;
+                gap: 15px;
+                text-align: center;
             }
 
-            #ekran-icerik {
-                /* Eklendi */
-                padding: 0 15px;
-            }
-
+            /* Saatin ve butonun çivilerini KESİNLİKLE söküyoruz (!important) */
             .zaman-paneli,
             #tema-butonu {
-                position: static;
+                position: static !important;
                 width: 100%;
                 max-width: 250px;
                 margin: 0 auto;
+            }
+
+            /* Mobilde logoyu biraz küçültüyoruz ki ekranı boğmasın */
+            .uygulama-logosu {
+                height: 80px;
             }
 
             .baslik {
@@ -391,6 +394,7 @@
 
             #ekran-icerik {
                 grid-template-columns: 1fr;
+                padding: 0 15px;
             }
 
             .grup-karti,

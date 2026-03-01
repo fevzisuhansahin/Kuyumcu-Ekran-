@@ -276,45 +276,44 @@
         /* --- MOBİL VE KÜÇÜK EKRAN UYUMU (İÇ İÇE GİRMEYİ ÖNLER) --- */
         @media (max-width: 1100px) {
             body {
-                /* Güncellendi */
                 padding: 0 0 70px 0;
             }
 
             .ust-bilgi {
-                /* Güncellendi */
+                flex-direction: column;
                 padding: 20px 15px;
+                gap: 15px;
+                text-align: center;
             }
 
-            #ekran-icerik {
-                /* Eklendi */
-                padding: 0 15px;
-            }
-
-            /* Saat ve Tema butonunun çivilerini söküyoruz, alt alta dizilmelerini sağlıyoruz */
+            /* Saatin ve butonun çivilerini KESİNLİKLE söküyoruz (!important) */
             .zaman-paneli,
             #tema-butonu {
-                position: static;
+                position: static !important;
                 width: 100%;
                 max-width: 250px;
                 margin: 0 auto;
+            }
+
+            /* Mobilde logoyu biraz küçültüyoruz ki ekranı boğmasın */
+            .uygulama-logosu {
+                height: 80px;
             }
 
             .baslik {
                 font-size: 1.6em;
             }
 
-            /* Izgara (Grid) yapısını tek sütuna düşürür */
             #ekran-icerik {
                 grid-template-columns: 1fr;
+                padding: 0 15px;
             }
 
-            /* Tüm kartları tam ekran genişliğine yayar */
             .grup-karti,
             .karti-tam-genislik {
                 grid-column: 1 / -1 !important;
                 grid-row: auto !important;
                 overflow-x: auto;
-                /* Tablo taşarsa sağa kaydırma çubuğu çıkarır */
                 padding: 15px;
             }
 
@@ -325,10 +324,6 @@
 
             th {
                 font-size: 0.8em;
-            }
-
-            .alt-bant {
-                font-size: 1.1em;
             }
         }
 
