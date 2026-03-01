@@ -7,11 +7,11 @@ const fs = require('fs');
 const cron = require('node-cron');
 
 const app = express();
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, '..', 'public')));
 
 // --- GİZLİ KAPIMIZ (ADMİN PANELİ YÖNLENDİRMESİ) ---
 app.get('/admin', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+    res.sendFile(path.join(__dirname, '..', 'public', 'admin.html'));
 });
 
 const server = http.createServer(app);
