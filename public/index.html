@@ -42,7 +42,7 @@
             color: var(--renk-metin);
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             margin: 0;
-            padding: 20px 60px;
+            padding: 0 0 70px 0;
             /* Alt bandın kapanmaması için ekstra padding */
             padding-bottom: 70px;
             min-height: 100vh;
@@ -57,13 +57,22 @@
             align-items: center;
             justify-content: center;
             background-color: var(--bg-kutu);
-            padding: 15px 30px;
-            border-radius: 10px;
-            margin-bottom: 20px;
+            padding: 15px 60px;
+            /* Yanlardan içe ittik */
+            border-radius: 0;
+            /* DEĞİŞTİ: Köşeler tamamen düzleştirildi */
+            margin-bottom: 30px;
             gap: 20px;
-            border: 1px solid var(--renk-cerceve);
+            border: none;
+            /* Etrafındaki çerçeve silindi */
+            border-bottom: 1px solid var(--renk-cerceve);
+            /* Sadece en alta şık bir çizgi eklendi */
             position: relative;
-            box-shadow: 0 4px 15px var(--kutu-golge);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+            /* Gölge hafifletilip sadece alta verildi */
+            width: 100%;
+            /* Ekranı tam kaplaması sağlandı */
+            box-sizing: border-box;
         }
 
         .baslik {
@@ -77,7 +86,7 @@
         /* --- CANLI SAAT TASARIMI --- */
         .zaman-paneli {
             position: absolute;
-            left: 30px;
+            left: 60px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -115,7 +124,7 @@
 
         #tema-butonu {
             position: absolute;
-            right: 30px;
+            right: 60px;
             padding: 10px 20px;
             background-color: var(--bg-body);
             color: var(--renk-metin);
@@ -132,6 +141,10 @@
             grid-template-rows: auto auto;
             gap: 25px;
             align-items: stretch;
+            padding: 0 100px;
+            /* EKLENDİ */
+            box-sizing: border-box;
+            /* EKLENDİ */
         }
 
         .grup-karti {
@@ -263,14 +276,18 @@
         /* --- MOBİL VE KÜÇÜK EKRAN UYUMU (İÇ İÇE GİRMEYİ ÖNLER) --- */
         @media (max-width: 1100px) {
             body {
-                padding: 15px 15px 70px 15px;
+                /* Güncellendi */
+                padding: 0 0 70px 0;
             }
 
             .ust-bilgi {
-                flex-direction: column;
-                padding: 20px;
-                gap: 15px;
-                text-align: center;
+                /* Güncellendi */
+                padding: 20px 15px;
+            }
+
+            #ekran-icerik {
+                /* Eklendi */
+                padding: 0 15px;
             }
 
             /* Saat ve Tema butonunun çivilerini söküyoruz, alt alta dizilmelerini sağlıyoruz */
