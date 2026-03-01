@@ -109,9 +109,16 @@ body {
     font-weight: bold;
 }
 
-#tema-butonu {
+/* --- SAĞ ÜST BUTONLAR GRUBU --- */
+.sag-butonlar {
     position: absolute;
     right: 60px;
+    display: flex;
+    gap: 15px;
+    /* İki buton arasına boşluk koyar */
+}
+
+#tema-butonu {
     padding: 10px 20px;
     background-color: var(--bg-body);
     color: var(--renk-metin);
@@ -120,6 +127,27 @@ body {
     cursor: pointer;
     font-weight: bold;
     transition: 0.3s;
+}
+
+/* YENİ: Giriş Yap Butonu Tasarımı (Temaya uygun renk alır) */
+#login-yonlendir-butonu {
+    padding: 10px 20px;
+    background-color: var(--renk-baslik);
+    color: var(--login-btn-text);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+#login-yonlendir-butonu:hover {
+    opacity: 0.85;
+    transform: translateY(-2px);
+}
+
+#tema-butonu:hover {
+    background-color: var(--renk-cerceve);
 }
 
 #ekran-icerik {
@@ -257,6 +285,17 @@ tr.dustu td {
     -webkit-backdrop-filter: blur(8px);
 }
 
+/* --- GERÇEK LOGO TASARIMI --- */
+.uygulama-logosu {
+    height: 130px;
+    width: auto;
+    border-radius: 8px;
+    object-fit: contain;
+    border: none;
+    padding: 3px;
+    transition: 0.4s ease;
+}
+
 /* --- MOBİL VE KÜÇÜK EKRAN UYUMU (İÇ İÇE GİRMEYİ ÖNLER) --- */
 @media (max-width: 1100px) {
     body {
@@ -270,12 +309,26 @@ tr.dustu td {
         text-align: center;
     }
 
+    /* YENİ: Saat ve Buton Grubunu mobilde serbest bırakıyoruz */
     .zaman-paneli,
-    #tema-butonu {
+    .sag-butonlar {
         position: static !important;
         width: 100%;
         max-width: 250px;
         margin: 0 auto;
+    }
+
+    /* YENİ: Butonları mobilde alt alta diziyoruz */
+    .sag-butonlar {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+
+    #tema-butonu,
+    #login-yonlendir-butonu {
+        width: 100%;
     }
 
     .uygulama-logosu {
@@ -307,15 +360,4 @@ tr.dustu td {
     th {
         font-size: 0.8em;
     }
-}
-
-/* --- GERÇEK LOGO TASARIMI --- */
-.uygulama-logosu {
-    height: 130px;
-    width: auto;
-    border-radius: 8px;
-    object-fit: contain;
-    border: none;
-    padding: 3px;
-    transition: 0.4s ease;
 }
