@@ -40,7 +40,7 @@ let gramUrunleri = [
 ];
 
 let piyasaUrunleri = [
-    { isim: "ALTIN", kod: "ALTIN", alisAyar: 0, satisAyar: 0 },
+    { isim: "HAS", kod: "ALTIN", alisAyar: 0, satisAyar: 0 },
     { isim: "GÜMÜŞ", kod: "GUMUSTRY", alisAyar: 0, satisAyar: 0 }
 ];
 
