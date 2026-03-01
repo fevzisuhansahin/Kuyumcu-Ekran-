@@ -157,9 +157,13 @@ function tvyeYayinla() {
 }
 
 // --- 2. ADIM: DIŞARIDAN SADECE İHTİYAÇ ANINDA VERİ ÇEKME ---
+// --- B PLANI EKLENMİŞ VERİ ÇEKME FONKSİYONU ---
 function piyasadanTekSeferlikVeriCek(otomatikYayinla = false) {
     console.log("📡 Piyasadan açılış verisi bekleniyor...");
-    const geciciSoket = ioClient("https://www.leventkuyumculuk.com", { transports: ["polling", "websocket"] });
+    const geciciSoket = ioClient("https://www.leventkuyumculuk.com", {
+        transports: ["polling", "websocket"],
+        timeout: 10000
+    });
 
     geciciSoket.once("price_changed", (gelenVeri) => {
         if (gelenVeri && gelenVeri.data) {
@@ -173,6 +177,20 @@ function piyasadanTekSeferlikVeriCek(otomatikYayinla = false) {
             }
         }
         geciciSoket.disconnect();
+    });
+
+    // İŞLER TERS GİDERSE (B PLANI):
+    geciciSoket.once("connect_error", (hata) => {
+        console.log("⚠️ UYARI: Karşı siteye bağlanılamadı! (Site çökmüş veya internet gitmiş olabilir)");
+        console.log("Hata Detayı: " + hata.message);
+
+        geciciSoket.disconnect(); // Takılı kalmasın diye bağlantıyı zorla koparıyoruz
+
+        // Sistemi çökertmek yerine 5 dakika (300.000 milisaniye) sonra işlemi tekrar başlatıyoruz
+        console.log("⏳ B Planı Devrede: 5 dakika sonra bağlantı tekrar denenecek...");
+        setTimeout(() => {
+            piyasadanTekSeferlikVeriCek(otomatikYayinla);
+        }, 5 * 60 * 1000);
     });
 }
 
