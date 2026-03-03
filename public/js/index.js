@@ -44,7 +44,7 @@ temaButonu.addEventListener("click", (olay) => {
 });
 
 const socket = io();
-const formatla = (sayi) => new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(sayi);
+const formatla = (sayi) => new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(sayi);
 
 let oncekiFiyatlar = {};
 
