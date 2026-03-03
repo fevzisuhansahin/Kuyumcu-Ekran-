@@ -86,24 +86,33 @@ socket.on("giris_basarili", (data) => {
             let baseEskiAlis = (guncel.eskiAlis || 0) - (urun.eskiAlisAyar || 0);
             let baseEskiSatis = (guncel.eskiSatis || 0) - (urun.eskiSatisAyar || 0);
 
+            // Değer yoksa en azından boş görünsün ki 0 yazısı kafa karıştırmasın
+            let gosterAlis = guncel.yeniAlis !== undefined ? guncel.yeniAlis : urun.alisAyar;
+            let gosterSatis = guncel.yeniSatis !== undefined ? guncel.yeniSatis : urun.satisAyar;
+            let gosterEskiAlis = guncel.eskiAlis !== undefined ? guncel.eskiAlis : (urun.eskiAlisAyar || 0);
+            let gosterEskiSatis = guncel.eskiSatis !== undefined ? guncel.eskiSatis : (urun.eskiSatisAyar || 0);
+
             document.getElementById("tbody-ziynet").innerHTML += `
                 <tr class="urun-ayar" data-kod="${urun.kod}" data-base-alis="${baseAlis}" data-base-satis="${baseSatis}" data-base-eski-alis="${baseEskiAlis}" data-base-eski-satis="${baseEskiSatis}">
                     <td class="isim-sutunu">${urun.isim}</td>
-                    <td><input type="number" step="50" class="fiyat-input" id="alis_${urun.kod}" value="${guncel.yeniAlis || 0}"></td>
-                    <td><input type="number" step="50" class="fiyat-input" id="satis_${urun.kod}" value="${guncel.yeniSatis || 0}"></td>
-                    <td><input type="number" step="50" class="fiyat-input" id="eski_alis_${urun.kod}" value="${guncel.eskiAlis || 0}"></td>
-                    <td><input type="number" step="50" class="fiyat-input" id="eski_satis_${urun.kod}" value="${guncel.eskiSatis || 0}"></td>
+                    <td><input type="number" step="50" class="fiyat-input" id="alis_${urun.kod}" value="${gosterAlis}"></td>
+                    <td><input type="number" step="50" class="fiyat-input" id="satis_${urun.kod}" value="${gosterSatis}"></td>
+                    <td><input type="number" step="50" class="fiyat-input" id="eski_alis_${urun.kod}" value="${gosterEskiAlis}"></td>
+                    <td><input type="number" step="50" class="fiyat-input" id="eski_satis_${urun.kod}" value="${gosterEskiSatis}"></td>
                 </tr>
             `;
         } else {
             let baseAlis = (guncel.alis || 0) - urun.alisAyar;
             let baseSatis = (guncel.satis || 0) - urun.satisAyar;
 
+            let gosterAlis = guncel.alis !== undefined ? guncel.alis : urun.alisAyar;
+            let gosterSatis = guncel.satis !== undefined ? guncel.satis : urun.satisAyar;
+
             document.getElementById("tbody-" + hedefTablo).innerHTML += `
                 <tr class="urun-ayar" data-kod="${urun.kod}" data-base-alis="${baseAlis}" data-base-satis="${baseSatis}">
                     <td class="isim-sutunu">${urun.isim}</td>
-                    <td><input type="number" step="50" class="fiyat-input" id="alis_${urun.kod}" value="${guncel.alis || 0}"></td>
-                    <td><input type="number" step="50" class="fiyat-input" id="satis_${urun.kod}" value="${guncel.satis || 0}"></td>
+                    <td><input type="number" step="50" class="fiyat-input" id="alis_${urun.kod}" value="${gosterAlis}"></td>
+                    <td><input type="number" step="50" class="fiyat-input" id="satis_${urun.kod}" value="${gosterSatis}"></td>
                 </tr>
             `;
         }

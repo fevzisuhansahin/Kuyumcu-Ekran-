@@ -1,4 +1,5 @@
 node_modules/
-ayarlar.json
-test.js
-direkt_veri_cekerek.js
+public/logo.png
+scripts/
+data/
+.env
