@@ -1,23 +1,33 @@
 {
   "CEYREK": {
     "alisAyar": 0,
-    "satisAyar": 0
+    "satisAyar": 0,
+    "eskiAlisAyar": 0,
+    "eskiSatisAyar": 0
   },
   "YARIM": {
     "alisAyar": 0,
-    "satisAyar": 0
+    "satisAyar": 0,
+    "eskiAlisAyar": 0,
+    "eskiSatisAyar": 0
   },
   "TAM": {
     "alisAyar": 0,
-    "satisAyar": 0
+    "satisAyar": 0,
+    "eskiAlisAyar": 0,
+    "eskiSatisAyar": 0
   },
   "GREMSE": {
     "alisAyar": 0,
-    "satisAyar": 0
+    "satisAyar": 0,
+    "eskiAlisAyar": 0,
+    "eskiSatisAyar": 0
   },
   "ATA": {
     "alisAyar": 0,
-    "satisAyar": 0
+    "satisAyar": 0,
+    "eskiAlisAyar": 0,
+    "eskiSatisAyar": 0
   },
   "ALTIN": {
     "alisAyar": 0,
@@ -29,6 +39,10 @@
   },
   "KULCEALTIN": {
     "alisAyar": 0,
+    "satisAyar": 0
+  },
+  "BILEZIK": {
+    "alisAyar": 20,
     "satisAyar": 0
   },
   "kayanYazi": "GEDİZ SARRAFLAR DERNEĞİ - GÜNCEL ALTIN FİYATLARI"

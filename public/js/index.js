@@ -53,6 +53,7 @@ socket.on("kayan_yazi_guncelle", (yeniYazi) => {
 });
 
 socket.on("guncel_fiyatlar", (grupluFiyatlar) => {
+    console.log("Güncel fiyatlar alındı:", grupluFiyatlar);
     const ekranIcerik = document.getElementById("ekran-icerik");
     ekranIcerik.innerHTML = "";
     const grupSirasi = ["Ziynet & Sarrafiye", "Piyasalar", "Gram Altın"];

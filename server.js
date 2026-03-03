@@ -41,6 +41,9 @@ function ayarlariYukle() {
 
             if (kayitliAyarlar.kayanYazi) state.kayanYaziMetni = kayitliAyarlar.kayanYazi;
 
+            // YENİ: Hafızadaki son piyasa fiyatlarını çekiyoruz (Levent sessizse hayat kurtarır)
+            if (kayitliAyarlar.guncelHamVeri) state.guncelHamVeri = kayitliAyarlar.guncelHamVeri;
+
             const tumUrunler = [...ziynetUrunleri, ...gramUrunleri, ...piyasaUrunleri];
             tumUrunler.forEach(u => {
                 if (kayitliAyarlar[u.kod]) {
@@ -62,7 +65,7 @@ function ayarlariYukle() {
 ayarlariYukle();
 
 function tvyeYayinla() {
-    if (!state.guncelHamVeri) return;
+    // YENİ: Ham veri olmasa bile fırlatmayı durdurmuyoruz (Manuel ürünler için)
     state.sonHesaplananFiyatlar = fiyatlariHesapla(state.guncelHamVeri);
     io.emit("guncel_fiyatlar", state.sonHesaplananFiyatlar);
     console.log("📺 YENİ FİYATLAR TV EKRANINA YANSITILDI!");
@@ -77,6 +80,16 @@ function piyasadanTekSeferlikVeriCek(otomatikYayinla = false) {
 
     geciciSoket.once("price_changed", (gelenVeri) => {
         if (gelenVeri && gelenVeri.data) {
+            console.log("✅ Karşı siteden veri başarıyla çekildi!");
+            state.guncelHamVeri = { ...state.guncelHamVeri, ...gelenVeri.data };
+            
+            // YENİ: Levent'ten gelen veriyi KALICI HAFIZAYA yazıyoruz
+            try {
+                const kayitliVeri = fs.existsSync(AYARLAR_DOSYASI) ? JSON.parse(fs.readFileSync(AYARLAR_DOSYASI, 'utf8')) : {};
+                kayitliVeri.guncelHamVeri = state.guncelHamVeri;
+                fs.writeFileSync(AYARLAR_DOSYASI, JSON.stringify(kayitliVeri, null, 2));
+            } catch(e) { console.log("Hafıza yazma hatası."); }
+            
             state.guncelHamVeri = { ...state.guncelHamVeri, ...gelenVeri.data };
             if (otomatikYayinla) {
                 tvyeYayinla();

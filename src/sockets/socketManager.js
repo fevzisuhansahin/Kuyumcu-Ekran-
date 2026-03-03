@@ -52,7 +52,8 @@ module.exports = (io, state, tvyeYayinla) => {
                 }
             });
 
-            const kaydedilecekData = { ...yeniMiktarlar, kayanYazi: state.kayanYaziMetni };
+            // YENİ: guncelHamVeri'yi de koruyarak kaydediyoruz
+            const kaydedilecekData = { ...yeniMiktarlar, kayanYazi: state.kayanYaziMetni, guncelHamVeri: state.guncelHamVeri };
             fs.writeFile(AYARLAR_DOSYASI, JSON.stringify(kaydedilecekData, null, 2), (err) => {
                 if (err) console.log("❌ Ayarlar dosyaya kaydedilirken hata oluştu!");
             });
