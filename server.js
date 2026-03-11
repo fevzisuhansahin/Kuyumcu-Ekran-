@@ -152,46 +152,13 @@ function piyasadanTekSeferlikVeriCek(otomatikYayinla = false) {
     geciciSoket.on("connect_error", (hata) => {
         console.log("⚠️ UYARI: Özbağ sunucusuna bağlanılamadı! Hata:", hata.message);
         console.log("⏳ B Planı Devrede: 5 dakika sonra bağlantı tekrar denenecek...");
+
+        // EKSİK OLAN HAYAT KURTARICI KOD BURASI!
+        tvyeYayinla();
+
         setTimeout(() => { piyasadanTekSeferlikVeriCek(otomatikYayinla); }, 5 * 60 * 1000);
     });
 }
-
-// function piyasadanTekSeferlikVeriCek(otomatikYayinla = false) {
-//     console.log("📡 Piyasadan açılış verisi bekleniyor...");
-//     const geciciSoket = ioClient("https://www.leventkuyumculuk.com", {
-//         transports: ["polling", "websocket"],
-//         timeout: 10000
-//     });
-
-//     geciciSoket.once("price_changed", (gelenVeri) => {
-//         if (gelenVeri && gelenVeri.data) {
-//             console.log("✅ Karşı siteden veri başarıyla çekildi!");
-//             state.guncelHamVeri = { ...state.guncelHamVeri, ...gelenVeri.data };
-
-//             // YENİ: Levent'ten gelen veriyi KALICI HAFIZAYA yazıyoruz
-//             try {
-//                 const kayitliVeri = fs.existsSync(AYARLAR_DOSYASI) ? JSON.parse(fs.readFileSync(AYARLAR_DOSYASI, 'utf8')) : {};
-//                 kayitliVeri.guncelHamVeri = state.guncelHamVeri;
-//                 fs.writeFileSync(AYARLAR_DOSYASI, JSON.stringify(kayitliVeri, null, 2));
-//             } catch (e) { console.log("Hafıza yazma hatası."); }
-
-//             state.guncelHamVeri = { ...state.guncelHamVeri, ...gelenVeri.data };
-//             if (otomatikYayinla) {
-//                 tvyeYayinla();
-//             } else {
-//                 console.log("✅ Sabah 09:00 verisi BEKLEME ODASINA alındı.");
-//             }
-//         }
-//         geciciSoket.disconnect();
-//     });
-
-//     geciciSoket.once("connect_error", (hata) => {
-//         console.log("⚠️ UYARI: Karşı siteye bağlanılamadı!");
-//         geciciSoket.disconnect();
-//         console.log("⏳ B Planı Devrede: 5 dakika sonra bağlantı tekrar denenecek...");
-//         setTimeout(() => { piyasadanTekSeferlikVeriCek(otomatikYayinla); }, 5 * 60 * 1000);
-//     });
-// }
 
 piyasadanTekSeferlikVeriCek(true);
 

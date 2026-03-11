@@ -63,10 +63,14 @@ function fiyatlariHesapla(anaVeri) {
         let hamFiyat = guvenliVeri[ayar.kod] || guvenliVeri["ALTIN"] || { alis: 0, satis: 0 };
         let saat = guvenliVeri[ayar.kod]?.tarih ? saatAyirla(guvenliVeri[ayar.kod].tarih) : altinSaat;
 
+        // YENİ: Gümüş için "Çarpan" İstisnası!
+        // Eğer ürün kodu GUMUSTRY ise 10'a yuvarla, değilse standart 50'ye yuvarla.
+        let yuvarlamaKati = (ayar.kod === "GUMUSTRY") ? 10 : 50;
+
         tvVerisi["Piyasalar"].push({
             isim: ayar.isim, saat: saat,
-            alis: Math.floor(hamFiyat.alis / 50) * 50 + ayar.alisAyar,
-            satis: Math.ceil(hamFiyat.satis / 50) * 50 + ayar.satisAyar
+            alis: Math.floor(hamFiyat.alis / yuvarlamaKati) * yuvarlamaKati + ayar.alisAyar,
+            satis: Math.ceil(hamFiyat.satis / yuvarlamaKati) * yuvarlamaKati + ayar.satisAyar
         });
     });
 

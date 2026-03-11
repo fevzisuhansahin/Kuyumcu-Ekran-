@@ -39,7 +39,6 @@ temaButonu.addEventListener("click", (olay) => {
 });
 
 const socket = io();
-let sonCanliFiyatlar = {};
 
 function girisYap() {
     const sifre = document.getElementById("sifre").value;
@@ -57,14 +56,6 @@ socket.on("giris_basarili", (data) => {
 
     document.getElementById("kayan_yazi_input").value = data.kayanYazi;
 
-    // Veriyi cebimize tam obje olarak alıyoruz (Eski ve Yeni fiyatlar dahil)
-    let tvVerisi = data.taslak;
-    if (tvVerisi) {
-        if (tvVerisi["Ziynet & Sarrafiye"]) tvVerisi["Ziynet & Sarrafiye"].forEach(item => sonCanliFiyatlar[item.isim] = item);
-        if (tvVerisi["Gram Altın"]) tvVerisi["Gram Altın"].forEach(item => sonCanliFiyatlar[item.isim] = item);
-        if (tvVerisi["Piyasalar"]) tvVerisi["Piyasalar"].forEach(item => sonCanliFiyatlar[item.isim] = item);
-    }
-
     const gruplar = {
         "CEYREK": "ziynet", "YARIM": "ziynet", "TAM": "ziynet", "GREMSE": "ziynet", "ATA": "ziynet",
         "ALTIN": "piyasa", "GUMUSTRY": "piyasa",
@@ -75,44 +66,33 @@ socket.on("giris_basarili", (data) => {
     document.getElementById("tbody-piyasa").innerHTML = "";
     document.getElementById("tbody-gram").innerHTML = "";
 
+    // ARTIK HESAPLAMA YOK: Direkt kaydedilen kârı (makası) veya Bilezik fiyatını ekrana basıyoruz
     data.ayarlar.forEach(urun => {
-        let guncel = sonCanliFiyatlar[urun.isim] || {};
         let hedefTablo = gruplar[urun.kod];
         if (!hedefTablo) return;
 
+        // YENİ: Adım (Step) aralığını ürüne göre belirliyoruz!
+        let adimAraligi = "50"; // Varsayılan olarak her şey 50'şer artsın
+        if (urun.kod === "GUMUSTRY") {
+            adimAraligi = "10"; // Sadece Gümüş 10'ar 10'ar artsın!
+        }
+
         if (hedefTablo === "ziynet") {
-            let baseAlis = (guncel.yeniAlis || 0) - urun.alisAyar;
-            let baseSatis = (guncel.yeniSatis || 0) - urun.satisAyar;
-            let baseEskiAlis = (guncel.eskiAlis || 0) - (urun.eskiAlisAyar || 0);
-            let baseEskiSatis = (guncel.eskiSatis || 0) - (urun.eskiSatisAyar || 0);
-
-            // Değer yoksa en azından boş görünsün ki 0 yazısı kafa karıştırmasın
-            let gosterAlis = guncel.yeniAlis !== undefined ? guncel.yeniAlis : urun.alisAyar;
-            let gosterSatis = guncel.yeniSatis !== undefined ? guncel.yeniSatis : urun.satisAyar;
-            let gosterEskiAlis = guncel.eskiAlis !== undefined ? guncel.eskiAlis : (urun.eskiAlisAyar || 0);
-            let gosterEskiSatis = guncel.eskiSatis !== undefined ? guncel.eskiSatis : (urun.eskiSatisAyar || 0);
-
             document.getElementById("tbody-ziynet").innerHTML += `
-                <tr class="urun-ayar" data-kod="${urun.kod}" data-base-alis="${baseAlis}" data-base-satis="${baseSatis}" data-base-eski-alis="${baseEskiAlis}" data-base-eski-satis="${baseEskiSatis}">
+                <tr class="urun-ayar" data-kod="${urun.kod}" data-eski-var="true">
                     <td class="isim-sutunu">${urun.isim}</td>
-                    <td><input type="number" step="50" class="fiyat-input" id="alis_${urun.kod}" value="${gosterAlis}"></td>
-                    <td><input type="number" step="50" class="fiyat-input" id="satis_${urun.kod}" value="${gosterSatis}"></td>
-                    <td><input type="number" step="50" class="fiyat-input" id="eski_alis_${urun.kod}" value="${gosterEskiAlis}"></td>
-                    <td><input type="number" step="50" class="fiyat-input" id="eski_satis_${urun.kod}" value="${gosterEskiSatis}"></td>
+                    <td><input type="number" step="${adimAraligi}" class="fiyat-input" id="alis_${urun.kod}" value="${urun.alisAyar || 0}"></td>
+                    <td><input type="number" step="${adimAraligi}" class="fiyat-input" id="satis_${urun.kod}" value="${urun.satisAyar || 0}"></td>
+                    <td><input type="number" step="${adimAraligi}" class="fiyat-input" id="eski_alis_${urun.kod}" value="${urun.eskiAlisAyar || 0}"></td>
+                    <td><input type="number" step="${adimAraligi}" class="fiyat-input" id="eski_satis_${urun.kod}" value="${urun.eskiSatisAyar || 0}"></td>
                 </tr>
             `;
         } else {
-            let baseAlis = (guncel.alis || 0) - urun.alisAyar;
-            let baseSatis = (guncel.satis || 0) - urun.satisAyar;
-
-            let gosterAlis = guncel.alis !== undefined ? guncel.alis : urun.alisAyar;
-            let gosterSatis = guncel.satis !== undefined ? guncel.satis : urun.satisAyar;
-
             document.getElementById("tbody-" + hedefTablo).innerHTML += `
-                <tr class="urun-ayar" data-kod="${urun.kod}" data-base-alis="${baseAlis}" data-base-satis="${baseSatis}">
+                <tr class="urun-ayar" data-kod="${urun.kod}">
                     <td class="isim-sutunu">${urun.isim}</td>
-                    <td><input type="number" step="50" class="fiyat-input" id="alis_${urun.kod}" value="${gosterAlis}"></td>
-                    <td><input type="number" step="50" class="fiyat-input" id="satis_${urun.kod}" value="${gosterSatis}"></td>
+                    <td><input type="number" step="${adimAraligi}" class="fiyat-input" id="alis_${urun.kod}" value="${urun.alisAyar || 0}"></td>
+                    <td><input type="number" step="${adimAraligi}" class="fiyat-input" id="satis_${urun.kod}" value="${urun.satisAyar || 0}"></td>
                 </tr>
             `;
         }
@@ -138,21 +118,17 @@ function kaydet() {
     let fiyatlar = {};
     document.querySelectorAll(".urun-ayar").forEach(satir => {
         let kod = satir.getAttribute("data-kod");
-        let baseAlis = Number(satir.getAttribute("data-base-alis"));
-        let baseSatis = Number(satir.getAttribute("data-base-satis"));
-        let inputAlis = Number(document.getElementById("alis_" + kod).value);
-        let inputSatis = Number(document.getElementById("satis_" + kod).value);
+        let eskiVar = satir.getAttribute("data-eski-var");
 
-        let ayarObj = { alisAyar: inputAlis - baseAlis, satisAyar: inputSatis - baseSatis };
+        // Direkt input içindeki saf rakamı alıp gönderiyoruz (Tersine mühendislik bitti!)
+        let ayarObj = {
+            alisAyar: Number(document.getElementById("alis_" + kod).value),
+            satisAyar: Number(document.getElementById("satis_" + kod).value)
+        };
 
-        let baseEskiAlis = satir.getAttribute("data-base-eski-alis");
-        let baseEskiSatis = satir.getAttribute("data-base-eski-satis");
-
-        if (baseEskiAlis !== null && baseEskiSatis !== null) {
-            let inputEskiAlis = Number(document.getElementById("eski_alis_" + kod).value);
-            let inputEskiSatis = Number(document.getElementById("eski_satis_" + kod).value);
-            ayarObj.eskiAlisAyar = inputEskiAlis - Number(baseEskiAlis);
-            ayarObj.eskiSatisAyar = inputEskiSatis - Number(baseEskiSatis);
+        if (eskiVar === "true") {
+            ayarObj.eskiAlisAyar = Number(document.getElementById("eski_alis_" + kod).value);
+            ayarObj.eskiSatisAyar = Number(document.getElementById("eski_satis_" + kod).value);
         }
 
         fiyatlar[kod] = ayarObj;
