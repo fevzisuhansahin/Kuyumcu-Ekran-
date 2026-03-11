@@ -15,10 +15,19 @@ const { fiyatlariHesapla } = require('./src/utils/calculator');
 const socketYoneticisi = require('./src/sockets/socketManager');
 
 const app = express();
+// CSS, JS ve resimler gibi statik dosyalar için public ana klasörünü açık tutuyoruz
 app.use(express.static('public'));
 
+// 1. ANA SAYFA (TV EKRANI) Yönlendirmesi
+app.get('/', (req, res) => {
+    // Artık 'public' içinde değil, 'public/html' içinde aramasını söylüyoruz
+    res.sendFile(path.join(__dirname, 'public', 'html', 'index.html'));
+});
+
+// 2. ADMİN PANELİ Yönlendirmesi
 app.get('/gediz_sistem_yonetim_0103', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+    // Admin panelinin de yeni adresini ('html' klasörü) gösteriyoruz
+    res.sendFile(path.join(__dirname, 'public', 'html', 'admin.html'));
 });
 
 const server = http.createServer(app);

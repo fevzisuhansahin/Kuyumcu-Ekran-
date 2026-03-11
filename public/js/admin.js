@@ -119,6 +119,21 @@ socket.on("giris_basarili", (data) => {
     });
 });
 
+// TV ekranına giden veriyi admin panelinden de gizlice dinliyoruz
+socket.on("guncel_fiyatlar", (tvVerisi) => {
+    const saatEtiketi = document.getElementById("canli-saat-etiketi");
+
+    if (saatEtiketi && tvVerisi["Ziynet & Sarrafiye"] && tvVerisi["Ziynet & Sarrafiye"].length > 0) {
+        // TV'ye giden verinin içinden saati cımbızla alıyoruz
+        const guncelSaat = tvVerisi["Ziynet & Sarrafiye"][0].saat;
+        saatEtiketi.innerText = guncelSaat;
+
+        // Fiyat her güncellendiğinde yazının bir anlık parlamasını sağlayan "Canlı Atış" efekti (Kalp atışı gibi)
+        saatEtiketi.style.color = "#ffffff";
+        setTimeout(() => { saatEtiketi.style.color = "#4ade80"; }, 300);
+    }
+});
+
 function kaydet() {
     let fiyatlar = {};
     document.querySelectorAll(".urun-ayar").forEach(satir => {
