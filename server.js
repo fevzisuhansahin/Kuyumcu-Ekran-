@@ -194,8 +194,17 @@ cron.schedule('0 9 * * *', () => {
 // --- SOKET HABERLEŞMESİNİ HARİCİ YÖNETİCİYE DEVREDİYORUZ ---
 socketYoneticisi(io, state, tvyeYayinla);
 
-server.listen(3000, () => {
-    console.log("🚀 KENDİ SUNUCUMUZ ÇALIŞIYOR!");
-    console.log("📺 TV Ekranı için   : http://localhost:3000");
-    console.log("⚙️  Admin Paneli için: http://localhost:3000/admin");
+const PORT = process.env.PORT || 3000;
+
+server.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 KENDİ SUNUCUMUZ ${PORT} PORTUNDA ÇALIŞIYOR!`);
+    console.log(`📺 TV Ekranı için   : http://localhost:${PORT}`);
+    console.log(`⚙️  Admin Paneli için: http://localhost:${PORT}/admin`);
 });
+
+// // sadece localhostta (127.0.0.1) çalışacak şekil
+// server.listen(3000, () => {
+//     console.log("🚀 KENDİ SUNUCUMUZ ÇALIŞIYOR!");
+//     console.log("📺 TV Ekranı için   : http://localhost:3000");
+//     console.log("⚙️  Admin Paneli için: http://localhost:3000/admin");
+// });
