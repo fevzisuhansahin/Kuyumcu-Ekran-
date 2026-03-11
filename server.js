@@ -71,42 +71,118 @@ function tvyeYayinla() {
     console.log("📺 YENİ FİYATLAR TV EKRANINA YANSITILDI!");
 }
 
+// --- YENİ ÖZBAĞ ENTEGRASYONU ---
 function piyasadanTekSeferlikVeriCek(otomatikYayinla = false) {
-    console.log("📡 Piyasadan açılış verisi bekleniyor...");
-    const geciciSoket = ioClient("https://www.leventkuyumculuk.com", {
-        transports: ["polling", "websocket"],
+    console.log("📡 Özbağ Toptancı'dan veri bekleniyor...");
+
+    // Özbağ'ın ana socket adresine bağlanıyoruz
+    const geciciSoket = ioClient("wss://veri.ozbag.com", {
+        transports: ["websocket"], // Sadece websocket kullanmaya zorluyoruz
         timeout: 10000
     });
 
-    geciciSoket.once("price_changed", (gelenVeri) => {
-        if (gelenVeri && gelenVeri.data) {
-            console.log("✅ Karşı siteden veri başarıyla çekildi!");
-            state.guncelHamVeri = { ...state.guncelHamVeri, ...gelenVeri.data };
-            
-            // YENİ: Levent'ten gelen veriyi KALICI HAFIZAYA yazıyoruz
+    // Postacının adı artık "prices"
+    geciciSoket.on("prices", (gelenVeriArray) => {
+        if (gelenVeriArray && Array.isArray(gelenVeriArray)) {
+            console.log("✅ Özbağ'dan güncel veri paketi başarıyla çekildi!");
+
+            // 1. Özbağ'ın dizisini hızlı arama yapabilmek için objeye çeviriyoruz
+            let ozbag = {};
+            gelenVeriArray.forEach(urun => {
+                ozbag[urun.Code] = urun;
+            });
+
+            // HAS'ın saatini alalım (Tüm ekran için geçerli olur)
+            let formatliSaat = ozbag['HAS'] ? new Date(ozbag['HAS'].Time).toLocaleTimeString('tr-TR') : new Date().toLocaleTimeString('tr-TR');
+
+            // 2. Doğrudan Eşleştirme (Matematik Yok!)
+            let donusturulmusVeri = {
+                "ALTIN": { alis: ozbag['HAS']?.Bid || 0, satis: ozbag['HAS']?.Ask || 0, tarih: formatliSaat },
+                "GUMUSTRY": { alis: ozbag['XAGUSD']?.Bid || 0, satis: ozbag['XAGUSD']?.Ask || 0, tarih: formatliSaat },
+
+                "CEYREK": {
+                    yeniAlis: ozbag['YENİ ÇEYR']?.Bid || 0, yeniSatis: ozbag['YENİ ÇEYR']?.Ask || 0,
+                    eskiAlis: ozbag['ESKİ ÇEYREK']?.Bid || 0, eskiSatis: ozbag['ESKİ ÇEYREK']?.Ask || 0
+                },
+                "YARIM": {
+                    yeniAlis: ozbag['YENİ YARIM']?.Bid || 0, yeniSatis: ozbag['YENİ YARIM']?.Ask || 0,
+                    eskiAlis: ozbag['ESKİ YARIM']?.Bid || 0, eskiSatis: ozbag['ESKİ YARIM']?.Ask || 0
+                },
+                "TAM": {
+                    yeniAlis: ozbag['YENİ TAM']?.Bid || 0, yeniSatis: ozbag['YENİ TAM']?.Ask || 0,
+                    eskiAlis: ozbag['ESKİ TAM']?.Bid || 0, eskiSatis: ozbag['ESKİ TAM']?.Ask || 0
+                },
+                "GREMSE": {
+                    yeniAlis: ozbag['YENİ GRAMSE']?.Bid || 0, yeniSatis: ozbag['YENİ GRAMSE']?.Ask || 0,
+                    eskiAlis: ozbag['ESKİ GRAMSE']?.Bid || 0, eskiSatis: ozbag['ESKİ GRAMSE']?.Ask || 0
+                },
+                "ATA": {
+                    yeniAlis: ozbag['YENİ ATA']?.Bid || 0, yeniSatis: ozbag['YENİ ATA']?.Ask || 0,
+                    eskiAlis: ozbag['ESKİ ATA']?.Bid || 0, eskiSatis: ozbag['ESKİ ATA']?.Ask || 0
+                }
+            };
+
+            // Gelen yeni veriyi mevcut verilerimizin üzerine yazıyoruz
+            state.guncelHamVeri = { ...state.guncelHamVeri, ...donusturulmusVeri };
+
+            // YENİ: Özbağ'dan gelen veriyi KALICI HAFIZAYA (settings.json) yazıyoruz
             try {
                 const kayitliVeri = fs.existsSync(AYARLAR_DOSYASI) ? JSON.parse(fs.readFileSync(AYARLAR_DOSYASI, 'utf8')) : {};
                 kayitliVeri.guncelHamVeri = state.guncelHamVeri;
                 fs.writeFileSync(AYARLAR_DOSYASI, JSON.stringify(kayitliVeri, null, 2));
-            } catch(e) { console.log("Hafıza yazma hatası."); }
-            
-            state.guncelHamVeri = { ...state.guncelHamVeri, ...gelenVeri.data };
+            } catch (e) { console.log("Hafıza yazma hatası."); }
+
             if (otomatikYayinla) {
                 tvyeYayinla();
             } else {
-                console.log("✅ Sabah 09:00 verisi BEKLEME ODASINA alındı.");
+                console.log("✅ Sabah verisi BEKLEME ODASINA alındı.");
             }
         }
-        geciciSoket.disconnect();
     });
 
-    geciciSoket.once("connect_error", (hata) => {
-        console.log("⚠️ UYARI: Karşı siteye bağlanılamadı!");
-        geciciSoket.disconnect();
+    geciciSoket.on("connect_error", (hata) => {
+        console.log("⚠️ UYARI: Özbağ sunucusuna bağlanılamadı! Hata:", hata.message);
         console.log("⏳ B Planı Devrede: 5 dakika sonra bağlantı tekrar denenecek...");
         setTimeout(() => { piyasadanTekSeferlikVeriCek(otomatikYayinla); }, 5 * 60 * 1000);
     });
 }
+
+// function piyasadanTekSeferlikVeriCek(otomatikYayinla = false) {
+//     console.log("📡 Piyasadan açılış verisi bekleniyor...");
+//     const geciciSoket = ioClient("https://www.leventkuyumculuk.com", {
+//         transports: ["polling", "websocket"],
+//         timeout: 10000
+//     });
+
+//     geciciSoket.once("price_changed", (gelenVeri) => {
+//         if (gelenVeri && gelenVeri.data) {
+//             console.log("✅ Karşı siteden veri başarıyla çekildi!");
+//             state.guncelHamVeri = { ...state.guncelHamVeri, ...gelenVeri.data };
+
+//             // YENİ: Levent'ten gelen veriyi KALICI HAFIZAYA yazıyoruz
+//             try {
+//                 const kayitliVeri = fs.existsSync(AYARLAR_DOSYASI) ? JSON.parse(fs.readFileSync(AYARLAR_DOSYASI, 'utf8')) : {};
+//                 kayitliVeri.guncelHamVeri = state.guncelHamVeri;
+//                 fs.writeFileSync(AYARLAR_DOSYASI, JSON.stringify(kayitliVeri, null, 2));
+//             } catch (e) { console.log("Hafıza yazma hatası."); }
+
+//             state.guncelHamVeri = { ...state.guncelHamVeri, ...gelenVeri.data };
+//             if (otomatikYayinla) {
+//                 tvyeYayinla();
+//             } else {
+//                 console.log("✅ Sabah 09:00 verisi BEKLEME ODASINA alındı.");
+//             }
+//         }
+//         geciciSoket.disconnect();
+//     });
+
+//     geciciSoket.once("connect_error", (hata) => {
+//         console.log("⚠️ UYARI: Karşı siteye bağlanılamadı!");
+//         geciciSoket.disconnect();
+//         console.log("⏳ B Planı Devrede: 5 dakika sonra bağlantı tekrar denenecek...");
+//         setTimeout(() => { piyasadanTekSeferlikVeriCek(otomatikYayinla); }, 5 * 60 * 1000);
+//     });
+// }
 
 piyasadanTekSeferlikVeriCek(true);
 
